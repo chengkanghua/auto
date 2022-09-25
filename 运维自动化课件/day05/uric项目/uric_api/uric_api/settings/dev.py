@@ -92,8 +92,8 @@ DATABASES = {
         "HOST": "127.0.0.1",
         "PORT": 3306,
         "USER": "root",
-        "PASSWORD": "yuan0316",
-        "NAME": "uric",
+        "PASSWORD": "123",
+        "NAME": "uric1",
     }
 }
 

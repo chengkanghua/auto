@@ -62,7 +62,7 @@ export default {
           // 按下回车键进行指令的发送
           ws.send(cmd);
 
-        } else if (ev.key === "BackSpace") {
+        } else if (ev.key === "Backspace") {
           // Do not delete the prompt
           if (term._core.buffer.x > 2) {
             term.write('\b \b')

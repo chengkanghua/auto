@@ -333,6 +333,18 @@ docker logs -f <容器名>
 
 ![image-20220807131336782](assets/image-20220807131336782.png)
 
+**解决中文汉化后还是有部分英文的问题**
+
+```bash
+# 顺序很重要
+1、安装插件(locale、Localization: Chinese (Simplified) Localization Support Plugin)；
+2、在System Configuration--Configure System下，将语言设定为en_US，Jenkins切换为英文；
+3、restart重启Jenkins：http://域名/restart；
+4、再次语言设定为zh_CN，Jenkins切换为中文。
+
+
+```
+
 
 
 ##### 凭据管理
@@ -353,7 +365,11 @@ docker logs -f <容器名>
 
 
 
+这里填写的node节点服务器的登录账号密码
+
 ![image-20220807140324269](assets/image-20220807140324269.png)
+
+  
 
 
 
@@ -396,11 +412,22 @@ docker logs -f <容器名>
 并在新建节点对应的服务器（也就是上面添加的192.168.233.129）修改jenkins工作目录的权限并为jenkins设置java链接文件。
 
 ```bash
+# node节点提前安装好和master一样版本的java   # 配置阿里云镜像源 安装速度更快
+apt-cache search openjdk
+root@ubuntu:~# apt-get install openjdk-11-jdk
+
+vim ~/.bashrc
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+
+source ~/.bashrc
+-----------------------------------------------
 # 这里 /var/jenkins/workspace 为上述步骤设置的节点的工作目录
 sudo mkdir -p /var/jenkins/workspace/jdk/bin/
 
-sudo chown -P moluo:moluo /var/jenkins
-
+sudo chown -P kanghua.kanghua /var/jenkins
+sudo chown -P kanghua.kanghua /var/jenkins/workspace/
 which java
 #  which java 命令的结果，/usr/bin/java，然后创建软连接
 sudo ln -s /usr/bin/java /var/jenkins/workspace/jdk/bin/java
@@ -472,7 +499,7 @@ jenkins在构建任务完成以后，可以设置结果通知的。它支持邮�
 
 
 
-配置邮件通知。
+配置邮件通知。  在系统配置–>邮件通知
 
 登陆要使用的SMTP服务器所在的站点配置，设置第三方邮件发送服务。
 
@@ -481,6 +508,8 @@ SMTP（简单邮件发送协议，Simple Mail Transfer Protocol）服务器，�
 ![image-20220807162422697](assets/image-20220807162422697.png)
 
 
+
+这里用户名 要和系统管理员邮箱一致
 
 ![image-20220807162717648](assets/image-20220807162717648.png)
 
@@ -594,7 +623,7 @@ services:
     restart: always
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://192.168.101.8:8993' # 此处填写所在服务器ip若有域名可以写域名
+        external_url 'http://10.211.55.20:8993' # 此处填写所在服务器ip若有域名可以写域名
         gitlab_rails['gitlab_shell_ssh_port'] = 2224
     ports:
       - '8993:8993' # 此处端口号须与 external_url 中保持一致，左边和右边都要一样
@@ -628,7 +657,7 @@ docker-compose down
 docker-compose up -d
 ```
 
-gitlab容器启动以后，需要等待几分钟，接着在浏览器访问登陆地址：http://192.168.101.8:8993/
+gitlab容器启动以后，需要等待几分钟，接着在浏览器访问登陆地址：http://10.211.55.20:8993/
 
 首次登陆需要创建一个管理员账号。
 
@@ -670,7 +699,7 @@ gitlab容器启动以后，需要等待几分钟，接着在浏览器访问登�
 
 不管是jenkins还是gitlab实际上都提供了外界操作的http api接口给开发者进行远程调用的。
 
-Gitlab RestAPI 文档：http://192.168.101.8:8993/help/api/api_resources.md
+Gitlab RestAPI 文档：http://10.211.55.20:8993/help/api/api_resources.md
 
 要使用Gitlab RestAPI需要配置访问令牌。
 
@@ -688,11 +717,19 @@ Gitlab RestAPI 文档：http://192.168.101.8:8993/help/api/api_resources.md
 
 
 
-jenkins RestAPI：http://127.0.0.1:8888/api/
+> http://10.211.55.20:8993/api/v4/projects
+>
+> PRIVATE-TOKEN
+
+
+
+jenkins RestAPI：http://10.211.55.20:8888/api/
 
 访问格式：http://账号:密码@服务端地址:端口/job/任务名/build
 
-jenkins状态的API：http://127.0.0.1:8888/api/json?pretty=true
+`http://kanghua:123@10.211.55.20:8888/job/demo/build`
+
+jenkins状态的API：http://10.211.55.20:8888/api/json?pretty=true
 
 
 
@@ -712,9 +749,10 @@ pip install python-gitlab
 
 ```python
 import gitlab
-url = "http://192.168.101.8"
-token = "yussaW8kaV26qhbOL9A3pMrScD7D6HdHRU2vPufs"
+url = "http://10.211.55.20:8993"
+token = "DhEuoU6s6VNziaX86ssj"
 gl = gitlab.Gitlab(url, token)
+print(gl)
 ```
 
 #### 常用操作
@@ -759,8 +797,8 @@ import gitlab
 
 if __name__ == '__main__':
     """获取所有项目列表"""
-    url = "http://192.168.101.8:8993/"
-    token = "LAgbKLyaysE4UjPyX1EV"
+    url = "http://10.211.55.20:8993"
+    token = "JMx5wL2CrLrJKnDDGzXo"
     gl = gitlab.Gitlab(url, token)
     # print(gl)
 
@@ -768,11 +806,11 @@ if __name__ == '__main__':
     # projects = gl.projects.list(all=True)
     # for project in projects:
     #     print(project.id, project.name ,project.description)
-    #
-    #
+
+
     # """获取单个项目"""
     # project = gl.projects.get(2)
-    #
+
     # print("项目ID", project.id)
     # print("项目描述", project.description)
     # print("项目名", project.name)
@@ -786,8 +824,7 @@ if __name__ == '__main__':
     # print("仓库派生数量", project.forks_count)
     # print("仓库星标数量", project.star_count)
     # print("仓库拥有者", getattr(project, "owner", None)) # 因为默认的第一个仓库是没有拥有者的!!
-    #
-    #
+
     #
     # """
     # {
@@ -915,9 +952,9 @@ if __name__ == '__main__':
 
 
     # """根据项目的可见性列出符合条件的项目"""
-    # # projects = gl.projects.list(visibility='public')  # 公有项目列表
+    # projects = gl.projects.list(visibility='public')  # 公有项目列表
     # projects = gl.projects.list(visibility='private') # 私有项目列表
-    # # projects = gl.projects.list(visibility='internal') # 内部项目列表
+    # projects = gl.projects.list(visibility='internal') # 内部项目列表
     # print(projects)
 
     """创建一个项目"""
@@ -927,28 +964,28 @@ if __name__ == '__main__':
     #     'description': '测试项目2',
     #     'visibility': 'public'
     # })
-
+    # print(project)
     # """更新一个项目"""
     # # 先获取项目
-    # project = gl.projects.get(5)
-    # # 在获取了项目以后，直接对当前项目对象设置属性进行覆盖，后面调用save方法即可保存更新内容
+    # project = gl.projects.get(3)
+    # 在获取了项目以后，直接对当前项目对象设置属性进行覆盖，后面调用save方法即可保存更新内容
     # project.description = "测试项目2的描述信息被修改了1次"
     # project.save()
 
     # """删除一个项目"""
-    # project = gl.projects.get(5)
+    # project = gl.projects.get(3)
     # project.delete()
 
 
 
     # """分支管理：获取所有分支"""
-    # project = gl.projects.get(3)
-    # # branches = project.branches.list()
-    # # print(branches)  # [<ProjectBranch name:main>]
-    #
+    # project = gl.projects.get(2)
+    # branches = project.branches.list()
+    # print(branches)  # [<ProjectBranch name:main>]
+
     # """根据名称获取一个分支"""
-    # project = gl.projects.get(3)
-    # branch = project.branches.get('main')
+    # project = gl.projects.get(2)
+    # branch = project.branches.get('master')
     # print("分支名称：", branch.name)
     # print("分支最新提交记录：", branch.commit)
     # print("分支合并状态：", branch.merged)
@@ -986,12 +1023,12 @@ if __name__ == '__main__':
     # """
 
     # """给指定项目创建分支"""
-    # project = gl.projects.get(3)
-    # branch = project.branches.create({'branch': 'feature/user', 'ref': 'main'})
+    # project = gl.projects.get(2)
+    # branch = project.branches.create({'branch': 'feature/user', 'ref': 'master'})
     # print(branch)
 
     """更新分支的属性【gitbal的v4版本中没有保护分支和取消保护分支的功能】"""
-    # project = gl.projects.get(3)
+    # project = gl.projects.get(2)
     # branch = project.branches.get('feature/user')
     # # 设置当前分支为保护分支
     # branch.protect()
@@ -999,21 +1036,21 @@ if __name__ == '__main__':
 
     # """删除一个分支"""
     # # 注意，只有一个保护分支时，是不能删除当前分支的
-    # project = gl.projects.get(3)
+    # project = gl.projects.get(2)
     # project.branches.delete('feature/user')
 
     # """创建一个tag标签"""
-    # project = gl.projects.get(3)
-    # tag = project.tags.create({'tag_name': 'v1.0', 'ref': 'main'})
+    # project = gl.projects.get(2)
+    # tag = project.tags.create({'tag_name': 'v1.0', 'ref': 'master'})
     # print(tag)
 
     # """获取所有tag标签"""
-    # project = gl.projects.get(3)
+    # project = gl.projects.get(2)
     # tags = project.tags.list(all=True)
     # print(tags)
 
     # """获取一个tag标签信息"""
-    # project = gl.projects.get(3)
+    # project = gl.projects.get(2)
     # tag = project.tags.get('v1.0')
     # print("标签名", tag.name)
     # print("标签的版本描述", tag.message)
@@ -1050,14 +1087,15 @@ if __name__ == '__main__':
 
 
     # """指定项目的commit提交记录"""
-    # project = gl.projects.get(3)
+    # project = gl.projects.get(2)
     # commits = project.commits.list(all=True)
     # print(commits)
 
     # """根据版本号来获取commit记录"""
-    # project = gl.projects.get(3)
-    # commit = project.commits.get("be71595d791b3437dee7e36a9dc221376392912f")
+    # project = gl.projects.get(2)
+    # commit = project.commits.get("c74c738d5f386ec062910b66620625e19deae9a8")
     # print(commit)
+    # print(getattr(commit,'title'))
     # """
     # {
     #     'id': 'be71595d791b3437dee7e36a9dc221376392912f',
@@ -1086,16 +1124,17 @@ if __name__ == '__main__':
 
 
     # """创建一个commit版本"""
-    # project = gl.projects.get(3)
+    # project = gl.projects.get(2)
     # data = {
-    # 'branch': 'main',
+    # 'branch': 'master',
     # 'commit_message': '提交代码的版本描述',
     #     'actions': [
     #         {
     #         'action': 'create',  # 创建文件
     #         # 'action': 'update',  # 更新文件
     #         # 'action': 'delete',    # 删除文件
-    #         'file_path': 'docs/uric_api/logs/uric.log', # 文件路径
+    #         # 'file_path':'uric.log' # 配合删除文件action就是删除的文件路径
+    #         'file_path': 'docs/uric_api/logs/uric.log', # 文件路径 上传文件的仓库的路径
     #         'content': '上传文件的内容'  # 文件内容
     #         }
     #     ]
@@ -1103,15 +1142,12 @@ if __name__ == '__main__':
     #
     # commit = project.commits.create(data)
 
-
     """获取用户列表"""
     # print(gl.users.list())  # [<User id:1 username:root>]
 
     """获取单个用户信息"""
     user = gl.users.get(1)
     print(user)
-
-
 ```
 
 
@@ -1120,7 +1156,6 @@ if __name__ == '__main__':
 
 ```python
 import gitlab
-
 
 class Gitlabapi(object):
     VISIBILITY = {
@@ -1490,11 +1525,12 @@ pip install python-jenkins
 
 ```python
 import jenkins
-    # 基于登陆密码连接jenkins
-    # server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='7bb3d493057242edaf5a9e72c63ca27e')
-    # 基于token连接jenkins
-    server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='11217915472cb72a7edb9a4de8113a5928')
-    print(server)
+
+# 基于登陆密码连接jenkins
+# server = jenkins.Jenkins('http://10.211.55.20:8888/', username='admin', password='7bb3d493057242edaf5a9e72c63ca27e')
+# 基于token连接jenkins
+server = jenkins.Jenkins('http://10.211.55.20:8888/', username='kanghua', password='1134c952f271ee074c74e96832ead64d28')
+print(server)
 ```
 
 #### token的获取方式
@@ -1532,7 +1568,7 @@ if __name__ == '__main__':
     # 基于登陆密码连接jenkins
     # server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='7bb3d493057242edaf5a9e72c63ca27e')
     # 基于token连接jenkins
-    server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='11217915472cb72a7edb9a4de8113a5928')
+    server = jenkins.Jenkins('http://10.211.55.20:8888/', username='kanghua', password='1134c952f271ee074c74e96832ead64d28')
     # print(server)
 
     # """我是谁?"""
@@ -1541,7 +1577,7 @@ if __name__ == '__main__':
     #
     # """jenkins的版本号"""
     # version = server.get_version()
-    # print(version)
+    # print(version)  # 2.361.1
 
     # """查看所有的构建任务"""
     # jobs = server.get_jobs()
@@ -1630,7 +1666,7 @@ if __name__ == '__main__':
     # """
 
     # """开始构建任务"""
-    # # 如果要构建的任务，不存在，则报错！！
+    # 如果要构建的任务，不存在，则报错！！
     # build_id = server.build_job(name='demo')
     # print(build_id)
 
@@ -1666,32 +1702,31 @@ if __name__ == '__main__':
     # config_xml = server.get_job_config(name="demo")
     # print(config_xml)
 
-#     """
-#     基于xml构建项目
-#     """
-#     config_xml = """<project>
-# <description>测试构建项目</description>
-# <keepDependencies>false</keepDependencies>
-# <properties/>
-# <scm class="hudson.scm.NullSCM"/>
-# <canRoam>true</canRoam>
-# <disabled>false</disabled>
-# <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-# <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-# <triggers/>
-# <concurrentBuild>false</concurrentBuild>
-# <builders>
-# <hudson.tasks.Shell>
-#   <command>echo "hello, project-1"</command>
-#   <configuredLocalRules/>
-# </hudson.tasks.Shell>
-# </builders>
-# <publishers/>
-# <buildWrappers/>
-# </project>"""
-#
-#     server.create_job("project-1", config_xml=config_xml)
-
+    #     """
+    #     基于xml构建项目
+    #     """
+    #     config_xml = """<project>
+    # <description>测试构建项目</description>
+    # <keepDependencies>false</keepDependencies>
+    # <properties/>
+    # <scm class="hudson.scm.NullSCM"/>
+    # <canRoam>true</canRoam>
+    # <disabled>false</disabled>
+    # <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+    # <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+    # <triggers/>
+    # <concurrentBuild>false</concurrentBuild>
+    # <builders>
+    # <hudson.tasks.Shell>
+    #   <command>echo "hello, project-1"</command>
+    #   <configuredLocalRules/>
+    # </hudson.tasks.Shell>
+    # </builders>
+    # <publishers/>
+    # <buildWrappers/>
+    # </project>"""
+    #
+    #     server.create_job("project-1", config_xml=config_xml)
 ```
 
 封装工具类，代码：
@@ -4883,7 +4918,7 @@ cd taobao
 git init  --initial-branch=master
 git config user.name "Administrator"
 git config user.email "admin@example.com"
-git remote add origin http://192.168.101.8:8993/root/taobao.git
+git remote add origin http://10.211.55.20:8993/root/taobao.git
 git add .
 git commit -m "first commit"
 git push -u origin master
@@ -4964,7 +4999,7 @@ kill -9 $(ps -aef | grep uwsgi | grep -v grep | awk '{print $2}')
 
 经过上面的步骤，我们就得到了一个使用jenkins基于gitlab进行ssh推送代码到远程主机的配置。
 
-可以通过之前等待python操作jenkins的接口，得到如下配置，发布django代码的发布流程：
+可以通过之前等待 python操作jenkins的接口，得到如下配置，发布django代码的发布流程：
 
 ```xml
 <?xml version='1.1' encoding='UTF-8'?>
@@ -5068,11 +5103,10 @@ kill -9 $(ps -aef | grep uwsgi | grep -v grep | awk &apos;{print $2}&apos;)
 ```python
 # jenkins配置信息
 JENKINS = {
-    "server_url": 'http://192.168.101.8:8888/',
-    "username": 'admin',
-    "password": '11217915472cb72a7edb9a4de8113a5928',
+    "server_url": 'http://10.211.55.20:8888/',
+    "username": 'kanghua',
+    "password": '1134c952f271ee074c74e96832ead64d28',
 }
-
 ```
 
 封装jenkins操作工具类，utils/jenkinsapi.py，代码：

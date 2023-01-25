@@ -929,7 +929,7 @@ v1 = f"我叫{name},今年{age}岁。"
   
   ```
   
-  ![image-20220909110014578](day01%20python%E5%85%A5%E9%97%A8.assets/image-20220909110014578.png)
+  ![image-20220909110014578](assets/image-20220909110014578.png)
   
   ```python
   score = input("请输入分数：")

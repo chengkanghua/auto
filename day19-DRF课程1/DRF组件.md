@@ -272,7 +272,7 @@ python manage.py makemigrationspython manage.py migrate
 python manage.py startapp students
 ```
 
-在syudents应用目录中新建serializers.py用于保存该应用的序列化器。
+在students应用目录中新建serializers.py用于保存该应用的序列化器。
 
 创建一个StudentModelSerializer用于序列化与反序列化。
 

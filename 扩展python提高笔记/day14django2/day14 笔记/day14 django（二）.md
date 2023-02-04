@@ -71,9 +71,9 @@
   - redis发布和订阅
 
     ```
-                  					A,1
+                  					    A,1
     发消息           [1]  			  B,1       
-                  				    C,1
+                  				      C,1
     ```
 
 
@@ -148,38 +148,41 @@ websocket，web版的 socket。
       ```
 
       ```
+      #返回给客户端 v3 密文
       HTTP/1.1 101 Switching Protocols
       Upgrade:websocket
       Connection: Upgrade
       Sec-WebSocket-Accept: 密文
       ```
-
+  
   - 收发数据（加密）
-
+  
     ```
     b"adasdjf;akjdfp;iujas;ldkjfpaisudflkasjd;fkjas;dkjf;aksjdf;ajksd;fjka;sdijkf"
     ```
-
+  
     - 先获取第2个字节，8位。 		10001010
-
+  
     - 再获取第二个字节的后7位。      0001010  ->  payload len
-
-      -   =127，2字节，8个字节，       其他字节（4字节 masking key + 数据）。
-      -   =126，2字节，2个字节，       其他字节（4字节 masking key + 数据）。
-      - <=125，2字节，                        其他字节（4字节 masking key + 数据）。
-
+  
+      -   =127，2字节，8个字节，前10个字节为数据头       其他字节（4字节 masking key + 数据）。
+      -   =126，2字节，2个字节，前4个字节为数据头       其他字节（4字节 masking key + 数据）。
+      - <=125，2字节， 前2个字节为数据头                       其他字节（4字节 masking key + 数据）。
+  
     - 获取masking key，然后对数据进行解密
-
+  
       ```
       var DECODED = "";
       for (var i = 0; i < ENCODED.length; i++) {
           DECODED[i] = ENCODED[i] ^ MASK[i % 4];
       }
       ```
-
+  
   - 断开连接。
+  
+  
 
-
+参考：[你真的了解WebSocket吗？ - (cnblogs.com)](https://www.cnblogs.com/wupeiqi/p/6558766.html)
 
 #### 1.3.2 django框架
 

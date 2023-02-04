@@ -6,7 +6,7 @@ USER_QUEUE = {}
 
 
 def home(request):
-    uid = request.GET.get('uid')
+    uid = request.GET.get('uid')   #uid最开始是浏览器地址栏传递过来的 127.0.0.1/home/?uid=alex
     USER_QUEUE[uid] = queue.Queue()
     return render(request, 'home.html', {"uid": uid})
 

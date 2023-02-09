@@ -253,8 +253,9 @@ docker logs -f <容器名>
 
 安装完成以后，创建管理员。
 
->注意：账号密码记住 ：  kanghua 123
+>注意：
 >
+>老师不知道各位同学的密码！！！自己设置的麻烦自己记一下哈。
 
 ![image-20220807084628321](assets/image-20220807084628321.png)
 
@@ -332,18 +333,6 @@ docker logs -f <容器名>
 
 ![image-20220807131336782](assets/image-20220807131336782.png)
 
-**解决中文汉化后还是有部分英文的问题**
-
-```bash
-# 顺序很重要
-1、安装插件(locale、Localization: Chinese (Simplified) Localization Support Plugin)；
-2、在System Configuration--Configure System下，将语言设定为en_US，Jenkins切换为英文；
-3、restart重启Jenkins：http://域名/restart；
-4、再次语言设定为zh_CN，Jenkins切换为中文。
-
-
-```
-
 
 
 ##### 凭据管理
@@ -364,11 +353,7 @@ docker logs -f <容器名>
 
 
 
-这里填写的node节点服务器的登录账号密码
-
 ![image-20220807140324269](assets/image-20220807140324269.png)
-
-  
 
 
 
@@ -411,22 +396,11 @@ docker logs -f <容器名>
 并在新建节点对应的服务器（也就是上面添加的192.168.233.129）修改jenkins工作目录的权限并为jenkins设置java链接文件。
 
 ```bash
-# node节点提前安装好和master一样版本的java   # 配置阿里云镜像源 安装速度更快
-apt-cache search openjdk
-root@ubuntu:~# apt-get install openjdk-11-jdk
-
-vim ~/.bashrc
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
-export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-
-source ~/.bashrc
------------------------------------------------
 # 这里 /var/jenkins/workspace 为上述步骤设置的节点的工作目录
 sudo mkdir -p /var/jenkins/workspace/jdk/bin/
 
-sudo chown -P kanghua.kanghua /var/jenkins
-sudo chown -P kanghua.kanghua /var/jenkins/workspace/
+sudo chown -P moluo:moluo /var/jenkins
+
 which java
 #  which java 命令的结果，/usr/bin/java，然后创建软连接
 sudo ln -s /usr/bin/java /var/jenkins/workspace/jdk/bin/java
@@ -498,7 +472,7 @@ jenkins在构建任务完成以后，可以设置结果通知的。它支持邮�
 
 
 
-配置邮件通知。  在系统配置–>邮件通知
+配置邮件通知。
 
 登陆要使用的SMTP服务器所在的站点配置，设置第三方邮件发送服务。
 
@@ -507,8 +481,6 @@ SMTP（简单邮件发送协议，Simple Mail Transfer Protocol）服务器，�
 ![image-20220807162422697](assets/image-20220807162422697.png)
 
 
-
-这里用户名 要和系统管理员邮箱一致
 
 ![image-20220807162717648](assets/image-20220807162717648.png)
 
@@ -622,7 +594,7 @@ services:
     restart: always
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://10.211.55.20:8993' # 此处填写所在服务器ip若有域名可以写域名
+        external_url 'http://192.168.101.8:8993' # 此处填写所在服务器ip若有域名可以写域名
         gitlab_rails['gitlab_shell_ssh_port'] = 2224
     ports:
       - '8993:8993' # 此处端口号须与 external_url 中保持一致，左边和右边都要一样
@@ -656,7 +628,7 @@ docker-compose down
 docker-compose up -d
 ```
 
-gitlab容器启动以后，需要等待几分钟，接着在浏览器访问登陆地址：http://10.211.55.20:8993/
+gitlab容器启动以后，需要等待几分钟，接着在浏览器访问登陆地址：http://192.168.101.8:8993/
 
 首次登陆需要创建一个管理员账号。
 
@@ -666,39 +638,9 @@ gitlab容器启动以后，需要等待几分钟，接着在浏览器访问登�
 
 #### 基本使用
 
->注意：记住账号密码。 root  root@123
+>注意：
 >
-
-忘记密码修改记录
-
-```bash
-(luffycity) root@ubuntu:/home/devops# docker exec -it gitlab /bin/bash
-
-root@2dc2fd6c60bf:/# gitlab-rails console
---------------------------------------------------------------------------------
- Ruby:         ruby 2.7.5p203 (2021-11-24 revision f69aeb8314) [x86_64-linux]
- GitLab:       14.6.1 (661d663ab2b) FOSS
- GitLab Shell: 13.22.1
- PostgreSQL:   12.7
---------------------------------------------------------------------------------
-
-
-Loading production environment (Rails 6.1.4.1)
-irb(main):008:0> user = User.where(id: 1).first
-=> #<User id:1 @root>
-irb(main):009:0> user.password = 'root@123'
-=> "root@123"
-irb(main):010:0> user.password_confirmation = 'root@123'
-=> "root@123"
-irb(main):011:0> user.save!
-=> true
-irb(main):012:0> quit
-
-参考： https://www.cnblogs.com/easonscx/p/12608486.html
-
-```
-
-
+>老师不知道各位同学的密码！！！自己设置的麻烦自己记一下哈。
 
 刚安装完成的gitlab默认已经内置了一个超级管理员root，密码保存在文件配置目录下initial_root_password文件中。
 
@@ -728,7 +670,7 @@ irb(main):012:0> quit
 
 不管是jenkins还是gitlab实际上都提供了外界操作的http api接口给开发者进行远程调用的。
 
-Gitlab RestAPI 文档：http://10.211.55.20:8993/help/api/api_resources.md
+Gitlab RestAPI 文档：http://192.168.101.8:8993/help/api/api_resources.md
 
 要使用Gitlab RestAPI需要配置访问令牌。
 
@@ -746,19 +688,11 @@ Gitlab RestAPI 文档：http://10.211.55.20:8993/help/api/api_resources.md
 
 
 
-> http://10.211.55.20:8993/api/v4/projects
->
-> PRIVATE-TOKEN
-
-
-
-jenkins RestAPI：http://10.211.55.20:8888/api/
+jenkins RestAPI：http://127.0.0.1:8888/api/
 
 访问格式：http://账号:密码@服务端地址:端口/job/任务名/build
 
-`http://kanghua:123@10.211.55.20:8888/job/demo/build`
-
-jenkins状态的API：http://10.211.55.20:8888/api/json?pretty=true
+jenkins状态的API：http://127.0.0.1:8888/api/json?pretty=true
 
 
 
@@ -778,10 +712,9 @@ pip install python-gitlab
 
 ```python
 import gitlab
-url = "http://10.211.55.20:8993"
-token = "DhEuoU6s6VNziaX86ssj"
+url = "http://192.168.101.8"
+token = "yussaW8kaV26qhbOL9A3pMrScD7D6HdHRU2vPufs"
 gl = gitlab.Gitlab(url, token)
-print(gl)
 ```
 
 #### 常用操作
@@ -826,8 +759,8 @@ import gitlab
 
 if __name__ == '__main__':
     """获取所有项目列表"""
-    url = "http://10.211.55.20:8993"
-    token = "JMx5wL2CrLrJKnDDGzXo"
+    url = "http://192.168.101.8:8993/"
+    token = "LAgbKLyaysE4UjPyX1EV"
     gl = gitlab.Gitlab(url, token)
     # print(gl)
 
@@ -835,11 +768,11 @@ if __name__ == '__main__':
     # projects = gl.projects.list(all=True)
     # for project in projects:
     #     print(project.id, project.name ,project.description)
-
-
+    #
+    #
     # """获取单个项目"""
     # project = gl.projects.get(2)
-
+    #
     # print("项目ID", project.id)
     # print("项目描述", project.description)
     # print("项目名", project.name)
@@ -853,7 +786,8 @@ if __name__ == '__main__':
     # print("仓库派生数量", project.forks_count)
     # print("仓库星标数量", project.star_count)
     # print("仓库拥有者", getattr(project, "owner", None)) # 因为默认的第一个仓库是没有拥有者的!!
-
+    #
+    #
     #
     # """
     # {
@@ -981,9 +915,9 @@ if __name__ == '__main__':
 
 
     # """根据项目的可见性列出符合条件的项目"""
-    # projects = gl.projects.list(visibility='public')  # 公有项目列表
+    # # projects = gl.projects.list(visibility='public')  # 公有项目列表
     # projects = gl.projects.list(visibility='private') # 私有项目列表
-    # projects = gl.projects.list(visibility='internal') # 内部项目列表
+    # # projects = gl.projects.list(visibility='internal') # 内部项目列表
     # print(projects)
 
     """创建一个项目"""
@@ -993,28 +927,28 @@ if __name__ == '__main__':
     #     'description': '测试项目2',
     #     'visibility': 'public'
     # })
-    # print(project)
+
     # """更新一个项目"""
     # # 先获取项目
-    # project = gl.projects.get(3)
-    # 在获取了项目以后，直接对当前项目对象设置属性进行覆盖，后面调用save方法即可保存更新内容
+    # project = gl.projects.get(5)
+    # # 在获取了项目以后，直接对当前项目对象设置属性进行覆盖，后面调用save方法即可保存更新内容
     # project.description = "测试项目2的描述信息被修改了1次"
     # project.save()
 
     # """删除一个项目"""
-    # project = gl.projects.get(3)
+    # project = gl.projects.get(5)
     # project.delete()
 
 
 
     # """分支管理：获取所有分支"""
-    # project = gl.projects.get(2)
-    # branches = project.branches.list()
-    # print(branches)  # [<ProjectBranch name:main>]
-
+    # project = gl.projects.get(3)
+    # # branches = project.branches.list()
+    # # print(branches)  # [<ProjectBranch name:main>]
+    #
     # """根据名称获取一个分支"""
-    # project = gl.projects.get(2)
-    # branch = project.branches.get('master')
+    # project = gl.projects.get(3)
+    # branch = project.branches.get('main')
     # print("分支名称：", branch.name)
     # print("分支最新提交记录：", branch.commit)
     # print("分支合并状态：", branch.merged)
@@ -1052,12 +986,12 @@ if __name__ == '__main__':
     # """
 
     # """给指定项目创建分支"""
-    # project = gl.projects.get(2)
-    # branch = project.branches.create({'branch': 'feature/user', 'ref': 'master'})
+    # project = gl.projects.get(3)
+    # branch = project.branches.create({'branch': 'feature/user', 'ref': 'main'})
     # print(branch)
 
     """更新分支的属性【gitbal的v4版本中没有保护分支和取消保护分支的功能】"""
-    # project = gl.projects.get(2)
+    # project = gl.projects.get(3)
     # branch = project.branches.get('feature/user')
     # # 设置当前分支为保护分支
     # branch.protect()
@@ -1065,21 +999,21 @@ if __name__ == '__main__':
 
     # """删除一个分支"""
     # # 注意，只有一个保护分支时，是不能删除当前分支的
-    # project = gl.projects.get(2)
+    # project = gl.projects.get(3)
     # project.branches.delete('feature/user')
 
     # """创建一个tag标签"""
-    # project = gl.projects.get(2)
-    # tag = project.tags.create({'tag_name': 'v1.0', 'ref': 'master'})
+    # project = gl.projects.get(3)
+    # tag = project.tags.create({'tag_name': 'v1.0', 'ref': 'main'})
     # print(tag)
 
     # """获取所有tag标签"""
-    # project = gl.projects.get(2)
+    # project = gl.projects.get(3)
     # tags = project.tags.list(all=True)
     # print(tags)
 
     # """获取一个tag标签信息"""
-    # project = gl.projects.get(2)
+    # project = gl.projects.get(3)
     # tag = project.tags.get('v1.0')
     # print("标签名", tag.name)
     # print("标签的版本描述", tag.message)
@@ -1116,15 +1050,14 @@ if __name__ == '__main__':
 
 
     # """指定项目的commit提交记录"""
-    # project = gl.projects.get(2)
+    # project = gl.projects.get(3)
     # commits = project.commits.list(all=True)
     # print(commits)
 
     # """根据版本号来获取commit记录"""
-    # project = gl.projects.get(2)
-    # commit = project.commits.get("c74c738d5f386ec062910b66620625e19deae9a8")
+    # project = gl.projects.get(3)
+    # commit = project.commits.get("be71595d791b3437dee7e36a9dc221376392912f")
     # print(commit)
-    # print(getattr(commit,'title'))
     # """
     # {
     #     'id': 'be71595d791b3437dee7e36a9dc221376392912f',
@@ -1153,17 +1086,16 @@ if __name__ == '__main__':
 
 
     # """创建一个commit版本"""
-    # project = gl.projects.get(2)
+    # project = gl.projects.get(3)
     # data = {
-    # 'branch': 'master',
+    # 'branch': 'main',
     # 'commit_message': '提交代码的版本描述',
     #     'actions': [
     #         {
     #         'action': 'create',  # 创建文件
     #         # 'action': 'update',  # 更新文件
     #         # 'action': 'delete',    # 删除文件
-    #         # 'file_path':'uric.log' # 配合删除文件action就是删除的文件路径
-    #         'file_path': 'docs/uric_api/logs/uric.log', # 文件路径 上传文件的仓库的路径
+    #         'file_path': 'docs/uric_api/logs/uric.log', # 文件路径
     #         'content': '上传文件的内容'  # 文件内容
     #         }
     #     ]
@@ -1171,12 +1103,15 @@ if __name__ == '__main__':
     #
     # commit = project.commits.create(data)
 
+
     """获取用户列表"""
     # print(gl.users.list())  # [<User id:1 username:root>]
 
     """获取单个用户信息"""
     user = gl.users.get(1)
     print(user)
+
+
 ```
 
 
@@ -1185,6 +1120,7 @@ if __name__ == '__main__':
 
 ```python
 import gitlab
+
 
 class Gitlabapi(object):
     VISIBILITY = {
@@ -1554,12 +1490,11 @@ pip install python-jenkins
 
 ```python
 import jenkins
-
-# 基于登陆密码连接jenkins
-# server = jenkins.Jenkins('http://10.211.55.20:8888/', username='admin', password='7bb3d493057242edaf5a9e72c63ca27e')
-# 基于token连接jenkins
-server = jenkins.Jenkins('http://10.211.55.20:8888/', username='kanghua', password='1134c952f271ee074c74e96832ead64d28')
-print(server)
+    # 基于登陆密码连接jenkins
+    # server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='7bb3d493057242edaf5a9e72c63ca27e')
+    # 基于token连接jenkins
+    server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='11217915472cb72a7edb9a4de8113a5928')
+    print(server)
 ```
 
 #### token的获取方式
@@ -1597,7 +1532,7 @@ if __name__ == '__main__':
     # 基于登陆密码连接jenkins
     # server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='7bb3d493057242edaf5a9e72c63ca27e')
     # 基于token连接jenkins
-    server = jenkins.Jenkins('http://10.211.55.20:8888/', username='kanghua', password='1134c952f271ee074c74e96832ead64d28')
+    server = jenkins.Jenkins('http://192.168.101.8:8888/', username='admin', password='11217915472cb72a7edb9a4de8113a5928')
     # print(server)
 
     # """我是谁?"""
@@ -1606,7 +1541,7 @@ if __name__ == '__main__':
     #
     # """jenkins的版本号"""
     # version = server.get_version()
-    # print(version)  # 2.361.1
+    # print(version)
 
     # """查看所有的构建任务"""
     # jobs = server.get_jobs()
@@ -1695,7 +1630,7 @@ if __name__ == '__main__':
     # """
 
     # """开始构建任务"""
-    # 如果要构建的任务，不存在，则报错！！
+    # # 如果要构建的任务，不存在，则报错！！
     # build_id = server.build_job(name='demo')
     # print(build_id)
 
@@ -1731,31 +1666,32 @@ if __name__ == '__main__':
     # config_xml = server.get_job_config(name="demo")
     # print(config_xml)
 
-    #     """
-    #     基于xml构建项目
-    #     """
-    #     config_xml = """<project>
-    # <description>测试构建项目</description>
-    # <keepDependencies>false</keepDependencies>
-    # <properties/>
-    # <scm class="hudson.scm.NullSCM"/>
-    # <canRoam>true</canRoam>
-    # <disabled>false</disabled>
-    # <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-    # <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-    # <triggers/>
-    # <concurrentBuild>false</concurrentBuild>
-    # <builders>
-    # <hudson.tasks.Shell>
-    #   <command>echo "hello, project-1"</command>
-    #   <configuredLocalRules/>
-    # </hudson.tasks.Shell>
-    # </builders>
-    # <publishers/>
-    # <buildWrappers/>
-    # </project>"""
-    #
-    #     server.create_job("project-1", config_xml=config_xml)
+#     """
+#     基于xml构建项目
+#     """
+#     config_xml = """<project>
+# <description>测试构建项目</description>
+# <keepDependencies>false</keepDependencies>
+# <properties/>
+# <scm class="hudson.scm.NullSCM"/>
+# <canRoam>true</canRoam>
+# <disabled>false</disabled>
+# <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+# <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+# <triggers/>
+# <concurrentBuild>false</concurrentBuild>
+# <builders>
+# <hudson.tasks.Shell>
+#   <command>echo "hello, project-1"</command>
+#   <configuredLocalRules/>
+# </hudson.tasks.Shell>
+# </builders>
+# <publishers/>
+# <buildWrappers/>
+# </project>"""
+#
+#     server.create_job("project-1", config_xml=config_xml)
+
 ```
 
 封装工具类，代码：
@@ -4947,7 +4883,7 @@ cd taobao
 git init  --initial-branch=master
 git config user.name "Administrator"
 git config user.email "admin@example.com"
-git remote add origin http://10.211.55.20:8993/root/taobao.git
+git remote add origin http://192.168.101.8:8993/root/taobao.git
 git add .
 git commit -m "first commit"
 git push -u origin master
@@ -5028,7 +4964,7 @@ kill -9 $(ps -aef | grep uwsgi | grep -v grep | awk '{print $2}')
 
 经过上面的步骤，我们就得到了一个使用jenkins基于gitlab进行ssh推送代码到远程主机的配置。
 
-可以通过之前等待 python操作jenkins的接口，得到如下配置，发布django代码的发布流程：
+可以通过之前等待python操作jenkins的接口，得到如下配置，发布django代码的发布流程：
 
 ```xml
 <?xml version='1.1' encoding='UTF-8'?>
@@ -5132,10 +5068,11 @@ kill -9 $(ps -aef | grep uwsgi | grep -v grep | awk &apos;{print $2}&apos;)
 ```python
 # jenkins配置信息
 JENKINS = {
-    "server_url": 'http://10.211.55.20:8888/',
-    "username": 'kanghua',
-    "password": '1134c952f271ee074c74e96832ead64d28',
+    "server_url": 'http://192.168.101.8:8888/',
+    "username": 'admin',
+    "password": '11217915472cb72a7edb9a4de8113a5928',
 }
+
 ```
 
 封装jenkins操作工具类，utils/jenkinsapi.py，代码：
@@ -6318,6 +6255,3933 @@ export default {
 }
 </style>
 ```
+
+# 七、定时计划
+
+界面效果：
+
+![image-20210312194844276](assets/image-20210312194844276.png)
+
+
+
+创建应用
+
+```python
+cd uric_api/apps/
+python ../../manage.py startapp schedule
+```
+
+
+
+配置应用，settings/dev.py，代码：
+
+```python
+INSTALLED_APPS = [
+    ...
+    'schedule',
+		...
+]
+```
+
+在应用中创建urls.py文件，`schedule.urls`，代码：
+
+```python
+from django.urls import path,re_path
+from . import views
+
+urlpatterns = [
+    
+]
+```
+
+总路由，`uric_api.urls`，代码：
+
+```python
+    path('schedule/', include('schedule.urls')),
+```
+
+创建模型类,保存任务计划，schedule/models.py，代码：
+
+```python
+from django.db import models
+from host.models import Host
+
+
+# Create your models here.
+class TaskSchedule(models.Model):
+    period_way_choices = (
+        (1, '普通任务'),  # 普通的异步任务
+        (2, '定时任务'),  # 定时一次异步任务
+        (3, '计划任务'),  # 定时多次异步任务
+    )
+
+    status_choices = (
+        (1, '激活'),
+        (2, '停止'),
+        (3, '报错'),
+    )
+
+    period_beat = models.IntegerField(verbose_name='任务ID', help_text='django-celery-beat调度服务的任务ID，方便我们通过这个id值来控制celery的任务状态', null=True, blank=True)
+    task_name = models.CharField(max_length=150, unique=True, verbose_name='任务名称')
+    task_cmd = models.TextField(verbose_name='任务指令')
+    period_way = models.IntegerField(choices=period_way_choices, default=1, verbose_name='任务周期方式')
+    period_content = models.CharField(max_length=32, verbose_name='任务执行周期')
+    period_status = models.IntegerField(choices=status_choices, default=1)
+
+    class Meta:
+        db_table = "schedule_taskschedule"
+        verbose_name = "任务记录表"
+        verbose_name_plural = verbose_name
+
+
+class TaskHost(models.Model):
+    tasks = models.ForeignKey('TaskSchedule',on_delete=models.CASCADE,verbose_name='执行的任务')
+    hosts = models.ForeignKey(Host,on_delete=models.CASCADE,verbose_name='任务执行主机')
+
+    class Meta:
+        db_table = "schedule_taskhost"  # 切换选中内容中的字母大小写：ctrl+Shift+U
+        verbose_name = "任务和主机的关系表"
+        verbose_name_plural = verbose_name
+
+```
+
+数据迁移，同步模型的数据表到MySQL中，新开终端窗口：
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+
+
+### celery定时计划
+
+celery是python的一个第三方模块，是一个可插拔的功能完备的异步任务框架，开源免费，高性能，支持协程、多进程、多线程的模式来高效执行异步任务，同时，因为使用的开发者众多，所以官方资料或第三方资料比较完善，同时基于celery开发的一些周边插件也是比较成熟可靠的。常用于完成项目开发中的耗时任务或者定时任务。最新版本已经到了5.2版本。
+
+![1629604514147](assets/1629604514147.png)
+
+
+
+安装依赖库
+
+```python
+pip install celery==4.4.7
+pip install django-celery-beat==2.0.0
+pip install django-celery-results==2.0.0
+pip install django-redis
+```
+
+windows系统下celery不要使用超过4.x以上版本，linux系统可以使用任意版本。
+
+
+
+项目配置文件中配置django-celery-beat，`stttings.dev`，代码：
+
+```python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    ...
+    'django_celery_beat',
+]
+
+LANGUAGE_CODE = 'zh-hans'  # 使用中国语言
+TIME_ZONE = 'Asia/Shanghai'  # 设置Django使用中国上海时间
+# 如果USE_TZ设置为True时，Django会使用当前操作系统默认设置的时区，此时的TIME_ZONE不管有没有设置都不起作用
+# 如果USE_TZ 设置为False,TIME_ZONE = 'Asia/Shanghai', 则使用上海的UTC时间。
+USE_TZ = False  # 如果用的sqlit数据库，那么改为True，sqlit数据库不支持
+```
+
+我们当前celery要使用redis作为消息队列，所以要记得查看下，redis是否正常启动了。
+
+OK，安装完成相关的模块以后，我们接下来要使用celery。
+
+首先，需要在uric_api服务端项目根目录下创建一个保存celery代码的包目录celery_tasks。
+
+在celery_tasks包目录下创建几个python文件，用于对celery进行初始化配置。
+
+main.py(celery初始化) 、config.py(配置文件) 、  tasks.py(任务文件，文件名必须叫tasks.py)
+
+celery_tasks/main.py，代码：
+
+```python
+import os
+
+# 为celery设置django相关的环境变量，方便将来在celery中调用django的代码
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'uric_api.settings.dev')
+
+from celery import Celery
+from . import config
+
+# 创建celery实例对象[可以以项目名作为名称，或者以项目根目录名也可以]
+app = Celery('uric_api')
+
+# 从配置文件中加载celery的相关配置
+app.config_from_object(config)
+
+# 设置app自动加载任务
+app.autodiscover_tasks([
+    'celery_tasks', # celery会自动得根据列表中对应的目录下的tasks.py 进行搜索注册
+])
+```
+
+celery_tasks/config.py
+
+```python
+# 为celery设置django相关的环境变量，方便将来在celery中调用django的代码
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'uric_api.settings.dev')
+from django.conf import settings
+
+# 设置celery接受任务的队列
+broker_url = 'redis://:12345678@127.0.0.1:6370/14'
+# 设置celery保存任务执行结果的队列
+result_backend = 'redis://:12345678@127.0.0.1:6370/15'
+
+# celery 的启动工作数量设置[进程数量]
+CELERY_WORKER_CONCURRENCY = 20
+
+# 任务预取功能，就是每个工作的进程／线程在获取任务的时候，会尽量多拿 n 个，以保证获取的通讯成本可以压缩。
+WORKER_PREFETCH_MULTIPLIER = 20
+
+# 非常重要,有些情况下可以防止死锁
+CELERYD_FORCE_EXECV = True
+
+# celery 的 worker 执行多少个任务后进行重启操作
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
+
+# 禁用所有速度限制，如果网络资源有限，不建议开足马力。
+worker_disable_rate_limits = True
+
+# celery beat配置
+CELERY_ENABLE_UTC = False
+settings.USE_TZ = True
+timezone = settings.TIME_ZONE
+# 保存定时任务记录的驱动类，使用mysql数据库来进行定时任务
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+```
+
+tasks.py，任务文件，注意：保存任务代码的文件名，必须叫tasks.py，否则celery不识别。
+
+```python
+from .main import app
+
+# 经过@app.task装饰过，就会被celery识别为任务，否则就是普通的函数
+@app.task
+def task1():
+    print("任务1函数正在执行....")
+
+@app.task
+def task2(a, b, c):
+    print(f"任务2函数正在执行，参数：{[a, b, c]}....")
+
+@app.task
+def task3():
+    print(f"任务3函数正在执行....")
+    return True
+
+@app.task
+def task4(a, b, c):
+    print(f"任务4函数正在执行....")
+    return a, b, c
+
+```
+
+上述配置做完之后，我们需要执行数据库迁移指令，去生成django_celery_beat应用的表
+
+```python
+python manage.py makemigrations
+python manage.py migrate
+```
+
+
+
+完成了数据迁移以后，我们接下来就要启动celery和celery_beat，让celery正常工作起来。
+
+```shell
+# 命令必须在manage.py的父目录下执行
+# 启动定时任务首先需要有一个work执行异步任务，然后再启动一个定时器触发任务。
+celery -A celery_tasks.main worker -l info
+# windows下关闭celery，快捷键：ctrl+C即可
+
+# 启动定时器触发 beat  (注意：下面是一条完整指令)
+celery -A celery_tasks.main beat -l info --scheduler  django_celery_beat.schedulers:DatabaseScheduler
+```
+
+接下来，我们还没有提供客户端的操作界面，所以我们要测试celery的定时任务，可以先在django的终端下进行测试。
+
+
+
+#### 普通周期任务
+
+```python
+# 进入django提供的shell终端，执行如下指令
+python manage.py shell
+
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+# executes every 10 seconds.
+# 从定时器数据表中获取一个10秒的计时器信息，如果没有则先创建一个再读取出来。
+schedule, _ = IntervalSchedule.objects.get_or_create(
+  		every=10,
+  		period=IntervalSchedule.SECONDS, # 单位，下面有说明
+)
+"""
+   # 可以看到上面固定间隔的时间是采用秒 period=IntervalSchedule.SECONDS，
+   # 如果你还想要固定其他的时间单位，可以设置其他字段参数，如下：
+   IntervalSchedule.DAYS 固定间隔天数
+   IntervalSchedule.HOURS 固定间隔小时数
+   IntervalSchedule.MINUTES 固定间隔分钟数
+   IntervalSchedule.SECONDS 固定间隔秒数
+   IntervalSchedule.MICROSECONDS 固定间隔微秒
+
+   # 可以从源码中进行查看
+   # from django_celery_beat.models import PeriodicTask, IntervalSchedule                                                                                                  
+   # IntervalSchedule.PERIOD_CHOICES                                                                                                                                       
+   # 能够看到单位选项：
+   (
+      ('days', 'Days'),
+      ('hours', 'Hours'),
+      ('minutes', 'Minutes'),
+      ('seconds', 'Seconds'),
+      ('microseconds', 'Microseconds')
+   )
+"""
+# 执行定时任务，带参数的
+import json
+from datetime import datetime, timedelta
+# 带参数的任务写法：
+period_obj = PeriodicTask.objects.create(
+     interval=schedule,                  # we created this above.
+     name='task4',                         # 唯一的任务名称，名字不能重复
+     task='celery_tasks.tasks.task4',                           # 如果任何没有设置别名，则必须填写任务的导包路径，否则直接写上别名即可。
+     args=json.dumps([5, 10, 15]),  # 异步任务有参数时，可以通过args或者kwargs来设置
+     #kwargs=json.dumps({
+     #   'be_careful': True,
+     #}),
+     expires=datetime.utcnow() + timedelta(seconds=30), # 任务的持续时间
+)
+
+# 不带参数的任务写法：
+period_obj1 = PeriodicTask.objects.create(
+     interval=schedule,                  # we created this above.
+     name='task1',                       # 唯一的任务名称，名字不能重复
+     task='celery_tasks.tasks.task1',    # 任务的导包路径
+     expires=datetime.utcnow() + timedelta(seconds=30), # 任务的持续时间
+)
+
+# 可以查看所有计划任务
+PeriodicTask.objects.all()
+# 所有任务执行都是ok的，只要数据库改变了，那么beat任务会自动调用执行，因为celery一直处于轮询状态。
+
+# 暂停执行两个周期性任务
+task = PeriodicTask.objects.get(name="task1")
+task.enabled = False # 把执行状态改成False，就可以暂停了。                       
+task.save() 
+
+# 把暂停的任务，重启激活。设置任务的 enabled 为 True 即可：
+task = PeriodicTask.objects.get(name="task1")
+task.enabled = True                                     
+task.save()
+
+# 删除任务
+task4 = PeriodicTask.objects.get(name="task4")
+task4.delete()
+
+# 注意：如果celery中的任务文件代码发生改变，例如tasks.py中的任务逻辑修改了，都需要重启beat和worker  
+```
+
+
+
+#### 基于 crontab 的周期性任务
+
+```python
+import pytz  
+# 创建周期
+# https://docs.celeryproject.org/en/v4.4.7/userguide/periodic-tasks.html#crontab-schedules
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
+schedule, _ = CrontabSchedule.objects.get_or_create( 
+     minute='*', 
+     hour='*', 
+     day_of_week='*', 
+     day_of_month='*', 
+     month_of_year='*', 
+     timezone=pytz.timezone('Asia/Shanghai') 
+)
+
+# 查看crontab数据表的中所有crontab定时器
+CrontabSchedule.objects.all()  
+
+
+# 执行周期任务
+PeriodicTask.objects.create(
+     crontab=schedule, # 上面创建的 crontab 对象 * * * * *，表示每分钟执行一次
+     name='task3', # 设置任务的name值，还是一样，name必须唯一
+     task='celery_tasks.tasks.task3',  # 指定需要周期性执行的任务，任务也可以通过args或kwargs添加参数
+)
+
+# 返回值
+# <PeriodicTask: my_task2_crontab: * * * * * (m/h/d/dM/MY) Asia/Shanghai>
+
+# 暂停执行两个周期性任务
+task3 = PeriodicTask.objects.get(name="task3")
+task3.enabled = False # 把执行状态改成False，就可以暂停了。                       
+task3.save() 
+
+```
+
+
+
+后端编写计划任务的异步任务注册celery中。
+
+celery_tasks/tasks.py
+
+```python
+from .main import app
+
+# 经过@app.task装饰过，就会被celery识别为任务，否则就是普通的函数
+@app.task
+def task1(a, b, c):
+    print("任务1函数正在执行....")
+    return a + b + c
+
+"""
+import json
+from datetime import datetime, timedelta
+period_obj = PeriodicTask.objects.create(
+     interval=schedule,                  # we created this above.
+     name='task23',                       # 唯一的任务名称，名字不能重复
+     task='celery_tasks.tasks.task1',    # 任务的导包路径
+     args=json.dumps([5, 10, 15]),  # 异步任务有参数时，可以通过args或者kwargs来设置
+     #kwargs=json.dumps({
+     #   'be_careful': True,
+     #}),
+     expires=datetime.utcnow() + timedelta(seconds=30), # 任务的持续时间
+)
+"""
+
+@app.task
+def task2():
+    print("任务2函数正在执行....")
+
+"""
+period_obj1 = PeriodicTask.objects.create(
+     interval=schedule,                  # we created this above.
+     name='task30',                       # 唯一的任务名称，名字不能重复
+     task='celery_tasks.tasks.task2',    # 任务的导包路径
+     expires=datetime.utcnow() + timedelta(seconds=30), # 任务的持续时间
+)
+"""
+
+# uric计划任务
+import json
+from host.models import Host
+from django.conf import settings
+from uric_api.utils.key import AppSetting
+@app.task(name='schedule_task')
+def schedule_task(cmd, hosts_ids):
+    """计划任务"""
+    hosts_objs = Host.objects.filter(id__in=hosts_ids)
+    result_data = []
+    private_key, public_key = AppSetting.get(settings.DEFAULT_KEY_NAME)
+    for host_obj in hosts_objs:
+        cli = host_obj.get_ssh(private_key)
+        code, result = cli.exec_command(cmd)
+        result_data.append({
+            'host_id': host_obj.id,
+            'host': host_obj.ip_addr,
+            'status': code,
+            'result': result
+        })
+        print('>>>>', code, result)
+
+    return json.dumps(result_data)
+```
+
+Schedule/views.py
+
+```python
+import json
+import random
+import pytz
+from datetime import datetime, timedelta
+from django_celery_beat.models import IntervalSchedule, CrontabSchedule, PeriodicTask
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import TaskSchedule, TaskHost
+from django.conf import settings
+
+class PeriodView(APIView):
+    # 获取计划任务的周期类型数据返回给客户端
+    def get(self,request):
+        data = TaskSchedule.period_way_choices
+        return Response(data)
+
+
+class TaskView(APIView):
+    def get(self,request):
+        # 1. 获取任务列表数据返回给客户端
+        # 2. 去redis中获取每个任务的执行结果展示给客户端
+        return Response([])
+
+    def post(self, request):
+        task_data = request.data
+        period_way = task_data.get('period_way')  # 计划任务的周期类型
+        hosts_ids = task_data.get('hosts')  # 计划任务的执行的远程主机列表
+        task_cmd = task_data.get('task_cmd')  # 计划任务要执行的任务指令
+        period_content = task_data.get('period_content')  # 计划任务的周期的时间值
+        task_name = task_data.get('task_name')  # 任务名称，注意不能重复
+        try:
+            PeriodicTask.objects.get(name=task_name)
+            task_name = f"{task_name}-{str(random.randint(1000, 9999))}"
+        except:
+            pass
+
+        if period_way == 1:  # 普通周期任务,默认单位为秒数，可以选择修改
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=int(period_content),
+                period=IntervalSchedule.SECONDS,
+            )
+            period_obj = PeriodicTask.objects.create(
+                interval=schedule,    # we created this above.
+                name=task_name,        # simply describes this periodic task.
+                task='schedule_task',  # name of task.
+                args=json.dumps([task_cmd, hosts_ids]),
+                expires=datetime.utcnow() + timedelta(minutes=30)
+            )
+            period_beat = period_obj.id
+        elif period_way == 2:  # 一次性任务
+            period_beat = 1
+            pass
+        else:  # cron任务
+            period_content_list = period_content.split(" ")
+            schedule, created = CrontabSchedule.objects.get_or_create(
+                minute=period_content_list[0],
+                hour=period_content_list[1],
+                day_of_week=period_content_list[2],
+                day_of_month=period_content_list[3],
+                month_of_year=period_content_list[4],
+                timezone=pytz.timezone(settings.TIME_ZONE)
+            )
+
+            period_obj = PeriodicTask.objects.create(
+                crontab=schedule,    # we created this above.
+                name=task_name,        # simply describes this periodic task.
+                task='celery_tasks.tasks.schedule_task',  # name of task.
+                args=json.dumps([task_cmd, hosts_ids]),
+            )
+            period_beat = period_obj.id
+
+        # 保存任务
+        task_schedule_obj = TaskSchedule.objects.create(**{
+            'period_beat': period_beat,  # celery-beat的任务id值
+            'period_way': period_way,
+            'task_cmd': task_cmd,
+            'period_content': period_content,
+            'task_name': task_name,
+            'period_status': 1,  # 默认为激活状态
+        })
+
+        for host_id in hosts_ids:
+            TaskHost.objects.create(**{
+                'tasks_id': task_schedule_obj.id,
+                'hosts_id': host_id,
+            })
+
+        return Response({'errmsg': 'ok'})
+
+```
+
+schedule/urls.py
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('periods/', views.PeriodView.as_view()),
+    path('tasks/', views.TaskView.as_view()),
+]
+```
+
+#### 客户端实现定时计划
+
+views/Schedule.vue，代码：
+
+```html
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showScheduleModal">新建周期任务</a-button>
+    </div>
+
+    <a-modal v-model:visible="ScheduleModalVisible" title="新建周期任务" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item ref="task_name" label="任务名称：" prop="task_name">
+          <a-input v-model:value="form.task_name"/>
+        </a-form-item>
+        <a-form-item label="请选择主机：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择主机"
+            @change="handleHostChange"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="请选择周期方式：" prop="hosts">
+          <a-select style="width: 120px" v-model:value="form.period_way" @change="handlePeriodChange">
+            <a-select-option v-for="(period_value,period_index) in period_way_choices" :value="period_value[0]" :key="period_index">
+              {{period_value[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="period_content" label="任务周期值：" prop="period_content">
+          <a-input v-model:value="form.period_content" />
+        </a-form-item>
+        <a-form-item ref="task_cmd" label="任务指令：" prop="task_cmd">
+          <v-ace-editor v-model:value="form.task_cmd" lang="html" theme="chrome" style="height: 200px"/>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="ScheduleList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a>禁用</a>
+              <span style="color: lightgray"> | </span>
+              <a>激活</a>
+              <span style="color: lightgray"> | </span>
+              <a>停止</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive, watch} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+
+
+import {VAceEditor} from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/mode-html';
+import 'ace-builds/src-noconflict/theme-chrome';
+
+export default {
+  components: {
+    VAceEditor,
+  },
+  setup() {
+
+    // 表格字段列设置
+    const columns = [
+      {
+        title: '任务名称',
+        dataIndex: 'name',
+        key: 'name',
+        sorter: true,
+        width: 230
+      },
+      {
+        title: '任务类型',
+        dataIndex: 'tag',
+        key: 'tag',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '任务周期',
+        dataIndex: 'description',
+        key: 'description'
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 周期任务列表
+    const ScheduleList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/schedule/tasks/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          ScheduleList.value = res.data;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const period_way_choices = ref([])  // 所有周期类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        task_name: '',
+        hosts: [],
+        period_way: 1,
+        task_cmd:'',
+        period_content:'',
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    const get_period_data = ()=>{
+        axios.get(`${settings.host}/schedule/periods/`).then((res)=>{
+          period_way_choices.value = res.data;
+          console.log(period_way_choices);
+        }).catch((error)=>{
+
+        })
+    }
+
+    get_period_data()
+
+    // 是否显示添加周期任务的弹窗
+    const ScheduleModalVisible = ref(false)
+    const showScheduleModal = ()=>{
+      ScheduleModalVisible.value = true
+    }
+
+    const handleHostChange = ()=>{
+
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+
+    }
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      period_way_choices,
+      host_list,
+      form,
+      rules,
+      ScheduleList,
+      ScheduleModalVisible,
+      showScheduleModal,
+      handleHostChange,
+      handOk,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+views/Base.vue，代码：
+
+```vue
+        {id: 5, icon: 'mail', title: '定时计划', tube: '', menu_url: '/uric/schedule', children: []},
+```
+
+router/index.js
+
+```js
+// ..
+import Schedule from "../views/Schedule"
+
+// ....
+            {
+                path: 'schedule',
+                name: 'Schedule',
+                component: Schedule,
+            },
+      ]
+    },
+
+  ]
+})
+
+```
+
+完成添加任务的提交
+
+```vue
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showScheduleModal">新建周期任务</a-button>
+    </div>
+
+    <a-modal v-model:visible="ScheduleModalVisible" title="新建周期任务" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item ref="task_name" label="任务名称：" prop="task_name">
+          <a-input v-model:value="form.task_name"/>
+        </a-form-item>
+        <a-form-item label="请选择主机：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择主机"
+            @change="handleHostChange"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="请选择周期方式：" prop="hosts">
+          <a-select style="width: 120px" v-model:value="form.period_way" @change="handlePeriodChange">
+            <a-select-option v-for="(period_value,period_index) in period_way_choices" :value="period_value[0]" :key="period_index">
+              {{period_value[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="period_content" label="任务周期值：" prop="period_content">
+          <a-input v-model:value="form.period_content" />
+        </a-form-item>
+        <a-form-item ref="task_cmd" label="任务指令：" prop="task_cmd">
+          <v-ace-editor v-model:value="form.task_cmd" lang="html" theme="chrome" style="height: 200px"/>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="ScheduleList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a>禁用</a>
+              <span style="color: lightgray"> | </span>
+              <a>激活</a>
+              <span style="color: lightgray"> | </span>
+              <a>停止</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive, watch} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+
+
+import {VAceEditor} from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/mode-html';
+import 'ace-builds/src-noconflict/theme-chrome';
+
+export default {
+  components: {
+    VAceEditor,
+  },
+  setup() {
+
+    // 表格字段列设置
+    const columns = [
+      {
+        title: '任务名称',
+        dataIndex: 'name',
+        key: 'name',
+        sorter: true,
+        width: 230
+      },
+      {
+        title: '任务类型',
+        dataIndex: 'tag',
+        key: 'tag',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '任务周期',
+        dataIndex: 'description',
+        key: 'description'
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 周期任务列表
+    const ScheduleList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/schedule/tasks/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          ScheduleList.value = res.data;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const period_way_choices = ref([])  // 所有周期类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        task_name: '',
+        hosts: [],
+        period_way: 1,
+        task_cmd:'',
+        period_content:'',
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    const get_period_data = ()=>{
+        axios.get(`${settings.host}/schedule/periods/`).then((res)=>{
+          period_way_choices.value = res.data;
+          console.log(period_way_choices);
+        }).catch((error)=>{
+
+        })
+    }
+
+    get_period_data()
+
+    // 是否显示添加周期任务的弹窗
+    const ScheduleModalVisible = ref(false)
+    const showScheduleModal = ()=>{
+      ScheduleModalVisible.value = true
+    }
+
+    const handleHostChange = ()=>{
+
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+      axios.post(`${settings.host}/schedule/tasks/`,form, {
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          ScheduleList.value.unshift(res.data);
+      })
+    }
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      period_way_choices,
+      host_list,
+      form,
+      rules,
+      ScheduleList,
+      ScheduleModalVisible,
+      showScheduleModal,
+      handleHostChange,
+      handOk,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+
+
+#### 显示计划任务列表
+
+schedule/views.py，代码：
+
+```python
+import json
+import random
+import pytz
+from datetime import datetime, timedelta
+from django_celery_beat.models import IntervalSchedule, CrontabSchedule, PeriodicTask
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import TaskSchedule, TaskHost
+from django.conf import settings
+from celery.schedules import schedule
+from django_celery_beat.tzcrontab import TzAwareCrontab
+class PeriodView(APIView):
+    # 获取计划任务的周期类型数据返回给客户端
+    def get(self,request):
+        data = TaskSchedule.period_way_choices
+        return Response(data)
+
+
+class TaskView(APIView):
+    def get(self,request):
+        # 1. 获取任务列表数据返回给客户端
+        task_list = PeriodicTask.objects.all()
+        results = [{
+            "id": task.id,
+            "name": task.name,
+            "enabled": task.enabled,
+            "type": "普通计划任务" if isinstance(task.schedule, schedule) else ("周期计划任务" if isinstance(task.schedule, TzAwareCrontab) else "定时一次任务"),
+        } for task in task_list]
+
+        # todo 2. 去redis中获取每个任务的执行结果展示给客户端
+
+        return Response(results)
+
+    def post(self, request):
+        task_data = request.data
+        period_way = task_data.get('period_way')  # 计划任务的周期类型
+        hosts_ids = task_data.get('hosts')  # 计划任务的执行的远程主机列表
+        task_cmd = task_data.get('task_cmd')  # 计划任务要执行的任务指令
+        period_content = task_data.get('period_content')  # 计划任务的周期的时间值
+        task_name = task_data.get('task_name')  # 任务名称，注意不能重复
+        try:
+            PeriodicTask.objects.get(name=task_name)
+            task_name = f"{task_name}-{str(random.randint(1000, 9999))}"
+        except:
+            pass
+
+        if period_way == 1:  # 普通周期任务,默认单位为秒数，可以选择修改
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=int(period_content),
+                period=IntervalSchedule.SECONDS,
+            )
+            period_obj = PeriodicTask.objects.create(
+                interval=schedule,    # we created this above.
+                name=task_name,        # simply describes this periodic task.
+                task='schedule_task',  # name of task.
+                args=json.dumps([task_cmd, hosts_ids]),
+                expires=datetime.utcnow() + timedelta(minutes=30)
+            )
+            period_beat = period_obj.id
+        elif period_way == 2:  # 一次性任务
+            period_beat = 1
+            pass
+        else:  # cron任务
+            period_content_list = period_content.split(" ")
+            schedule, created = CrontabSchedule.objects.get_or_create(
+                minute=period_content_list[0],
+                hour=period_content_list[1],
+                day_of_week=period_content_list[2],
+                day_of_month=period_content_list[3],
+                month_of_year=period_content_list[4],
+                timezone=pytz.timezone(settings.TIME_ZONE)
+            )
+
+            period_obj = PeriodicTask.objects.create(
+                crontab=schedule,    # we created this above.
+                name=task_name,        # simply describes this periodic task.
+                task='celery_tasks.tasks.schedule_task',  # name of task.
+                args=json.dumps([task_cmd, hosts_ids]),
+            )
+            period_beat = period_obj.id
+
+        # 保存任务
+        task_schedule_obj = TaskSchedule.objects.create(**{
+            'period_beat': period_beat,  # celery-beat的任务id值
+            'period_way': period_way,
+            'task_cmd': task_cmd,
+            'period_content': period_content,
+            'task_name': task_name,
+            'period_status': 1,  # 默认为激活状态
+        })
+
+        for host_id in hosts_ids:
+            TaskHost.objects.create(**{
+                'tasks_id': task_schedule_obj.id,
+                'hosts_id': host_id,
+            })
+
+        return Response({'errmsg': 'ok'})
+```
+
+客户端展示数据
+
+```vue
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showScheduleModal">新建周期任务</a-button>
+    </div>
+
+    <a-modal v-model:visible="ScheduleModalVisible" title="新建周期任务" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item ref="task_name" label="任务名称：" prop="task_name">
+          <a-input v-model:value="form.task_name"/>
+        </a-form-item>
+        <a-form-item label="请选择主机：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择主机"
+            @change="handleHostChange"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="请选择周期方式：" prop="hosts">
+          <a-select style="width: 120px" v-model:value="form.period_way" @change="handlePeriodChange">
+            <a-select-option v-for="(period_value,period_index) in period_way_choices" :value="period_value[0]" :key="period_index">
+              {{period_value[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="period_content" label="任务周期值：" prop="period_content">
+          <a-input v-model:value="form.period_content" />
+        </a-form-item>
+        <a-form-item ref="task_cmd" label="任务指令：" prop="task_cmd">
+          <v-ace-editor v-model:value="form.task_cmd" lang="html" theme="chrome" style="height: 200px"/>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="ScheduleList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a v-if="record.enabled">暂停</a>
+              <a v-else>激活</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive, watch} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+
+
+import {VAceEditor} from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/mode-html';
+import 'ace-builds/src-noconflict/theme-chrome';
+
+export default {
+  components: {
+    VAceEditor,
+  },
+  setup() {
+
+    // 表格字段列设置
+    const columns = [
+      {
+        title: '任务ID',
+        dataIndex: 'id',
+        key: 'id',
+        sorter: true,
+        width: 230
+      },
+      {
+        title: '任务名称',
+        dataIndex: 'name',
+        key: 'name',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '任务类型',
+        dataIndex: 'type',
+        key: 'type'
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 周期任务列表
+    const ScheduleList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/schedule/tasks/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          ScheduleList.value = res.data;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const period_way_choices = ref([])  // 所有周期类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        task_name: '',
+        hosts: [],
+        period_way: 1,
+        task_cmd:'',
+        period_content:'',
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    const get_period_data = ()=>{
+        axios.get(`${settings.host}/schedule/periods/`).then((res)=>{
+          period_way_choices.value = res.data;
+          console.log(period_way_choices);
+        }).catch((error)=>{
+
+        })
+    }
+
+    get_period_data()
+
+    // 是否显示添加周期任务的弹窗
+    const ScheduleModalVisible = ref(false)
+    const showScheduleModal = ()=>{
+      ScheduleModalVisible.value = true
+    }
+
+    const handleHostChange = ()=>{
+
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+      axios.post(`${settings.host}/schedule/tasks/`,form, {
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          ScheduleList.value.unshift(res.data);
+      })
+    }
+
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      period_way_choices,
+      host_list,
+      form,
+      rules,
+      ScheduleList,
+      ScheduleModalVisible,
+      showScheduleModal,
+      handleHostChange,
+      handOk,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+#### 切换计划任务状态
+
+schedule/views.py，代码：
+
+```python
+import json
+import random
+import pytz
+from datetime import datetime, timedelta
+from django_celery_beat.models import IntervalSchedule, CrontabSchedule, PeriodicTask
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import TaskSchedule, TaskHost
+from django.conf import settings
+from celery.schedules import schedule
+from django_celery_beat.tzcrontab import TzAwareCrontab
+from rest_framework import status
+
+class PeriodView(APIView):
+    # 获取计划任务的周期类型数据返回给客户端
+    def get(self,request):
+        data = TaskSchedule.period_way_choices
+        return Response(data)
+
+
+class TaskView(APIView):
+    def get(self,request):
+        # 1. 获取任务列表数据返回给客户端
+        task_list = PeriodicTask.objects.all()
+        results = [{
+            "id": task.id,
+            "name": task.name,
+            "enabled": task.enabled,
+            "type": "普通计划任务" if isinstance(task.schedule, schedule) else ("周期计划任务" if isinstance(task.schedule, TzAwareCrontab) else "定时一次任务"),
+        } for task in task_list]
+
+        # todo 2. 去redis中获取每个任务的执行结果展示给客户端
+
+        return Response(results)
+
+    def post(self, request):
+        task_data = request.data
+        period_way = task_data.get('period_way')  # 计划任务的周期类型
+        hosts_ids = task_data.get('hosts')  # 计划任务的执行的远程主机列表
+        task_cmd = task_data.get('task_cmd')  # 计划任务要执行的任务指令
+        period_content = task_data.get('period_content')  # 计划任务的周期的时间值
+        task_name = task_data.get('task_name')  # 任务名称，注意不能重复
+        try:
+            PeriodicTask.objects.get(name=task_name)
+            task_name = f"{task_name}-{str(random.randint(1000, 9999))}"
+        except:
+            pass
+
+        if period_way == 1:  # 普通周期任务,默认单位为秒数，可以选择修改
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=int(period_content),
+                period=IntervalSchedule.SECONDS,
+            )
+            period_obj = PeriodicTask.objects.create(
+                interval=schedule,    # we created this above.
+                name=task_name,        # simply describes this periodic task.
+                task='schedule_task',  # name of task.
+                args=json.dumps([task_cmd, hosts_ids]),
+                expires=datetime.utcnow() + timedelta(minutes=30)
+            )
+            period_beat = period_obj.id
+        elif period_way == 2:  # 一次性任务
+            period_beat = 1
+            pass
+        else:  # cron任务
+            period_content_list = period_content.split(" ")
+            schedule, created = CrontabSchedule.objects.get_or_create(
+                minute=period_content_list[0],
+                hour=period_content_list[1],
+                day_of_week=period_content_list[2],
+                day_of_month=period_content_list[3],
+                month_of_year=period_content_list[4],
+                timezone=pytz.timezone(settings.TIME_ZONE)
+            )
+
+            period_obj = PeriodicTask.objects.create(
+                crontab=schedule,    # we created this above.
+                name=task_name,        # simply describes this periodic task.
+                task='celery_tasks.tasks.schedule_task',  # name of task.
+                args=json.dumps([task_cmd, hosts_ids]),
+            )
+            period_beat = period_obj.id
+
+        # 保存任务
+        task_schedule_obj = TaskSchedule.objects.create(**{
+            'period_beat': period_beat,  # celery-beat的任务id值
+            'period_way': period_way,
+            'task_cmd': task_cmd,
+            'period_content': period_content,
+            'task_name': task_name,
+            'period_status': 1,  # 默认为激活状态
+        })
+
+        for host_id in hosts_ids:
+            TaskHost.objects.create(**{
+                'tasks_id': task_schedule_obj.id,
+                'hosts_id': host_id,
+            })
+
+        return Response({'errmsg': 'ok'})
+
+class TaskDetaiView(APIView):
+    def put(self, request, pk):
+        """激活/禁用计划任务"""
+        try:
+            task = PeriodicTask.objects.get(id=pk)
+        except:
+            return Response({"errmsg":" 当前任务不存在 ！"}, status=status.HTTP_400_BAD_REQUEST)
+
+        task.enabled = not task.enabled
+        task.save()
+
+        return Response({"errmsg": "ok"})
+```
+
+schedule/urls.py，代码：
+
+```python
+from django.urls import path, re_path
+from . import views
+
+urlpatterns = [
+    path('periods/', views.PeriodView.as_view()),
+    path('tasks/', views.TaskView.as_view()),
+    re_path('tasks/(?P<pk>\d+)/', views.TaskDetaiView.as_view()),
+]
+```
+
+客户端实现点击切换计划任务状态
+
+```vue
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showScheduleModal">新建周期任务</a-button>
+    </div>
+
+    <a-modal v-model:visible="ScheduleModalVisible" title="新建周期任务" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item ref="task_name" label="任务名称：" prop="task_name">
+          <a-input v-model:value="form.task_name"/>
+        </a-form-item>
+        <a-form-item label="请选择主机：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择主机"
+            @change="handleHostChange"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="请选择周期方式：" prop="hosts">
+          <a-select style="width: 120px" v-model:value="form.period_way" @change="handlePeriodChange">
+            <a-select-option v-for="(period_value,period_index) in period_way_choices" :value="period_value[0]" :key="period_index">
+              {{period_value[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="period_content" label="任务周期值：" prop="period_content">
+          <a-input v-model:value="form.period_content" />
+        </a-form-item>
+        <a-form-item ref="task_cmd" label="任务指令：" prop="task_cmd">
+          <v-ace-editor v-model:value="form.task_cmd" lang="html" theme="chrome" style="height: 200px"/>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="ScheduleList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a v-if="record.enabled" @click="change_schedule_status(record)">暂停</a>
+              <a v-else  @click="change_schedule_status(record)">激活</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive, watch} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+
+
+import {VAceEditor} from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/mode-html';
+import 'ace-builds/src-noconflict/theme-chrome';
+
+export default {
+  components: {
+    VAceEditor,
+  },
+  setup() {
+
+    // 表格字段列设置
+    const columns = [
+      {
+        title: '任务ID',
+        dataIndex: 'id',
+        key: 'id',
+        sorter: true,
+        width: 230
+      },
+      {
+        title: '任务名称',
+        dataIndex: 'name',
+        key: 'name',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '任务类型',
+        dataIndex: 'type',
+        key: 'type'
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 周期任务列表
+    const ScheduleList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/schedule/tasks/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          ScheduleList.value = res.data;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const period_way_choices = ref([])  // 所有周期类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        task_name: '',
+        hosts: [],
+        period_way: 1,
+        task_cmd:'',
+        period_content:'',
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    const get_period_data = ()=>{
+        axios.get(`${settings.host}/schedule/periods/`).then((res)=>{
+          period_way_choices.value = res.data;
+          console.log(period_way_choices);
+        }).catch((error)=>{
+
+        })
+    }
+
+    get_period_data()
+
+    // 是否显示添加周期任务的弹窗
+    const ScheduleModalVisible = ref(false)
+    const showScheduleModal = ()=>{
+      ScheduleModalVisible.value = true
+    }
+
+    const handleHostChange = ()=>{
+
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+      axios.post(`${settings.host}/schedule/tasks/`,form, {
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          ScheduleList.value.unshift(res.data);
+      })
+    }
+
+    // 切换计划任务的状态
+    const change_schedule_status = (record)=>{
+      axios.put(`${settings.host}/schedule/tasks/${record.id}/`,{}, {
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          record.enabled = !record.enabled;
+      })
+    }
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      period_way_choices,
+      host_list,
+      form,
+      rules,
+      ScheduleList,
+      ScheduleModalVisible,
+      showScheduleModal,
+      handleHostChange,
+      handOk,
+      change_schedule_status,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+# 八、监控预警
+
+### 监控
+
+在python运维开发中，针对系统参数进行监控，一般实现方式有2种：
+
+1. 远程SSH连接监控的目标主机，远程执行对应的监控命令，获取相关的系统参数。
+2. 远程部署脚本，通过在监控的目标主机上，上传安装对应的程序客户端，执行参数收集的程序。
+
+psutil是一个开源的跨平台的系统信息操作模块，支持Linux、windows等大部分操作系统，是系统管理员和运维人员不可或缺的必备模块。其提供了便利的函数用来获取才做系统的信息，比如CPU，内存，磁盘，网络等。此外，psutil还可以用来进行进程管理，包括判断进程是否存在、获取进程列表、获取进程详细信息等。而且psutil还提供了许多命令行工具提供的功能，包括：ps，top，lsof，netstat，ifconfig， who，df，kill，free，nice，ionice，iostat，iotop，uptime，pidof，tty，taskset，pmap。
+
+根据psutils提供的功能函数的功能，主要分为CPU、磁盘、内存、网络等几类。
+
+官方文档：https://psutil.readthedocs.io/en/latest/
+
+安装命令：
+
+```bash
+pip install psutil -i https://pypi.douban.com/simple
+# python -m pip install psutil -i https://pypi.douban.com/simple
+```
+
+| 函数                                           | 描述                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| **cpu_count(,[logical])**                      | 获取CPU的个数，默认获取逻辑CPU个数，当logical=False时，获取物理CPU的个数。 |
+| **cpu_times(,[percpu])**                       | 获取系统CPU时间信息，percpu=True表示获取每个CPU的时间信息    |
+| cpu_times_percent(,[percpu])                   | 功能和cpu_times大致相同，返回耗时比例。                      |
+| **cpu_percent(,[percpu],[interval])**          | 读取CPU的利用率，percpu=True时显示所有物理核心的利用率，interval!=0时，则阻塞时显示interval执行的时间内的平均利用率 |
+| cpu_stats()                                    | 以元组的形式返回CPU的统计信息，包括上下文切换，中断，软中断和系统调用次数。 |
+| **cpu_freq([percpu])**                         | 返回cpu频率，percpu=True时，返回单个cpu频率                  |
+| **getloadavg()**                               | 以元组的形式返回最近1、5和15分钟内的平均系统负载。           |
+| **virtual_memory()**                           | 获取系统内存的使用情况                                       |
+| **swap_memory()**                              | 获取系统交换内存的统计信息                                   |
+| **disk_partitions()**                          | 获取磁盘的分区数据                                           |
+| **disk_usage(path)**                           | 获取指定路径所属的分区磁盘的使用统计信息                     |
+| disk_io_counters()                             | 获取磁盘io操作相关信息                                       |
+| **net_io_counters(pernic=False, nowrap=True)** | 获取网络 I/O 统计信息                                        |
+| **net_connections(kind='inet')**               | 网卡的连接信息                                               |
+| **net_if_addrs()**                             | 网卡的地址信息                                               |
+| **net_if_stats()**                             | 网卡的状态信息                                               |
+| **boot_time()**                                | 系统启动时间                                                 |
+| **users()**                                    | 当前连接到操作系统的用户列表                                 |
+
+
+
+#### 基本使用
+
+```python
+import psutil
+
+"""查看cpu个数"""
+# print( psutil.cpu_count() )  # 4，逻辑CPU个数
+# print( psutil.cpu_count(logical=False) ) # 2，物理CPU个数
+
+"""查看cpu运行状态信息"""
+# print( psutil.cpu_times(percpu=True) )
+# scputimes(
+#   user=937.05,    # 用户进程使用的CPU时间累计
+#   nice=26.94,     # 优先级为负值的进程使用时间
+#   system=211.48,  # 系统内核进程使用时间累计
+#   idle=1480.49,   # CPU空闲时间累计
+#   iowait=15.02,   # 等待IO花费的时间
+#   irq=0.0,        # 硬中断时间累计
+#   softirq=26.94,  # 软中断时间累计
+#   steal=0.0,      # 花费在虚拟机中的时间
+#   guest=0.0,
+#   guest_nice=0.0
+# )
+
+"""查看cpu运行状态比例信息"""
+# print(psutil.cpu_times_percent())
+# scputimes(user=0.0, nice=0.0, system=0.0, idle=1.0, iowait=0.0, irq=0.0, softirq=0.0, steal=0.0, guest=0.0, guest_nice=0.0)
+
+
+"""查看cpu利用率"""
+# print( psutil.cpu_percent(interval=None) )  # 0.0
+# print( psutil.cpu_percent(interval=1) )  # 4.3
+# print( psutil.cpu_percent(percpu=True) )  # [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+
+"""CPU的统计信息"""
+# print(psutil.cpu_stats())
+# scpustats(
+#   ctx_switches=6672143,  # 自操作系统启动的上下文切换次数
+#   interrupts=4119465,    # 自操作系统启动以来的中断数
+#   soft_interrupts=2539436,  # 自操作系统启动以来的软中断数
+#   syscalls=0                # 自操作系统启动以来的系统调用次数
+# )
+
+"""CPU的频率"""
+# print(psutil.cpu_freq())
+# scpufreq(
+#   current=2208.0,   # 当前频率
+#   min=0.0,          # 最小频率
+#   max=0.0           # 最大频率
+# )
+
+"""以元组的形式返回最近1、5和15分钟内的平均系统负载。"""
+# print(psutil.getloadavg())  # (0.48, 0.39, 0.22)
+
+
+"""获取内存信息"""
+# print(psutil.virtual_memory())
+# svmem(
+#   total=5420404736,     # 总物理内存，total = used + free
+#   available=1328689152, # 可用内存，free = buffers + cached
+#   percent=75.5,         # 已用内存的百分比，percent=(total - available) / total * 100
+#   used=3783630848,      # 物理已使用的内存
+#   free=112947200,       # 物理没使用的空闲内存
+#   active=818221056,     # 当前正在使用或最近使用的内存
+#   inactive=3860795392,  # 未使用的内存
+#   buffers=98254848,     # 缓冲区内存
+#   cached=1425571840,    # 缓存占用内存
+#   shared=8818688,       # 可以被多个进程同时访问的内存
+#   slab=289615872        # 缓存内核数据结构的内存
+# )
+
+"""以人类可读的方式输出内存大小"""
+# from psutil._common import bytes2human
+# ret = bytes2human(psutil.virtual_memory()[0])
+# print(ret)  # 5.0G
+
+
+"""系统交换内存统计信息"""
+# print(psutil.swap_memory())
+# sswap(
+#   total=2147479552,   # 总交换内存
+#   used=284708864,     # 已使用的交换内存
+#   free=1862770688,    # 未使用过的空闲交换内存
+#   percent=13.3,       # 已用交换内存的百分比，percent=(total - available) / total * 100
+#   sin=100696064,      # 系统累积从硬盘转入的字节数
+#   sout=342335488      # 系统累积从硬盘转出的字节数
+# )
+
+"""磁盘分区数据"""
+# print(psutil.disk_partitions())
+# [
+#   sdiskpart(device='设备路径', mountpoint='挂载点路径', fstype='分区文件系统', opts='以逗号分隔的字符串，指示驱动器/分区的不同挂载选项'),
+#   sdiskpart(device='/dev/sda5', mountpoint='/', fstype='ext4', opts='rw,relatime,errors=remount-ro'),
+#   sdiskpart(device='/dev/loop0', mountpoint='/snap/core18/2284', fstype='squashfs', opts='ro,nodev,relatime'),
+#   sdiskpart(device='/dev/sda1', mountpoint='/boot/efi', fstype='vfat', opts='rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro')
+# ]
+
+
+"""获取指定路径所属的分区磁盘的使用统计信息"""
+# print(psutil.disk_usage("/"))
+# sdiskusage(
+#   total=52044496896,  # 总磁盘空间
+#   used=40965885952,   # 已用磁盘空间
+#   free=8404480000,    # 用户可用的空间
+#   percent=83.0        # 用户对磁盘的利用率
+# )
+
+
+"""磁盘io操作相关信息"""
+# print(psutil.disk_io_counters())
+# sdiskio(
+#   read_count=130506,  # 读取次数
+#   write_count=74714,  # 写入次数
+#   read_bytes=4225399296,  # 读取的字节数
+#   write_bytes=3102049280, # 写入的字节数
+#   read_time=52547,        # 从磁盘读取所花费的时间（以毫秒为单位）
+#   write_time=24460,       # 写入磁盘所花费的时间（以毫秒为单位）
+#   read_merged_count=48032,   # 合并读取的数量
+#   write_merged_count=152722, # 合并写入的数量
+#   busy_time=178944        # 实际 I/O 所花费的时间 (以毫秒为单位)
+# )
+
+"""获取网络 I/O 统计信息"""
+# print(psutil.net_io_counters())
+# snetio(
+#   bytes_sent=1416706,   # 网卡接收的数据字节数
+#   bytes_recv=14261510,  # 网卡接收的数据字节数
+#   packets_sent=20303,   # 网卡发送的数据包数
+#   packets_recv=27037,   # 网卡接收到的数据包数
+#   errin=0,              # 网卡接收数据时的错误总数
+#   errout=0,             # 网卡发送数据时的错误总数
+#   dropin=0,             # 网卡在网络请求被丢弃的传入数据包总数
+#   dropout=0             # 网卡在网络请求被丢弃的传出数据包总数
+# )
+
+# print(psutil.net_io_counters().bytes_sent)
+# print(psutil.net_io_counters().bytes_recv)
+# print(psutil.net_io_counters().packets_sent)
+# print(psutil.net_io_counters().packets_recv)
+
+
+"""网卡的连接信息"""
+# print(psutil.net_connections())
+# [
+#   sconn(fd=套接字文件描述符(windows和Linux下为-1), family=地址族, type=地址类型, laddr=本地地址, raddr=绝对地址, status=TCP连接的状态, pid=打开套接字的进程的 PID进程ID),
+#   sconn(fd=-1, family=<AddressFamily.AF_INET6: 10>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='::', port=22), raddr=(), status='LISTEN', pid=None),
+#   sconn(fd=-1, family=<AddressFamily.AF_INET6: 10>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='::', port=22), raddr=(), status='LISTEN', pid=None),
+#   sconn(fd=-1, family=<AddressFamily.AF_INET: 2>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='0.0.0.0', port=22), raddr=(), status='LISTEN', pid=None),
+#   sconn(fd=-1, family=<AddressFamily.AF_INET: 2>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='127.0.0.1', port=6379), raddr=(), status='LISTEN', pid=None),
+#   sconn(fd=-1, family=<AddressFamily.AF_INET: 2>, type=<SocketKind.SOCK_DGRAM: 2>, laddr=addr(ip='192.168.233.129', port=68), raddr=addr(ip='192.168.233.254', port=67), status='NONE', pid=None),
+#   sconn(fd=-1, family=<AddressFamily.AF_INET: 2>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='0.0.0.0', port=80), raddr=(), status='LISTEN', pid=None),
+#   sconn(fd=67, family=<AddressFamily.AF_INET6: 10>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='::ffff:127.0.0.1', port=63342), raddr=(), status='LISTEN', pid=3993),
+# ]
+
+
+"""网卡的地址信息"""
+# print(psutil.net_if_addrs())
+# {
+#   'lo': [
+#     snicaddr(family=地址族, address='主网卡地址', netmask='网络掩码地址', broadcast=广播地址, ptp=点对点接口（通常是 VPN）上的目标地址),
+#     snicaddr(family=<AddressFamily.AF_INET: 2>, address='127.0.0.1', netmask='255.0.0.0', broadcast=None, ptp=None),
+#     snicaddr(family=<AddressFamily.AF_INET6: 10>, address='::1', netmask='ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff', broadcast=None, ptp=None),
+#     snicaddr(family=<AddressFamily.AF_PACKET: 17>, address='00:00:00:00:00:00', netmask=None, broadcast=None, ptp=None)
+#   ],
+#   'ens33': [
+#     snicaddr(family=<AddressFamily.AF_INET: 2>, address='192.168.233.129', netmask='255.255.255.0', broadcast='192.168.233.255', ptp=None),
+#     snicaddr(family=<AddressFamily.AF_INET6: 10>, address='fe80::59eb:3d0b:84e:950f%ens33', netmask='ffff:ffff:ffff:ffff::', broadcast=None, ptp=None),
+#     snicaddr(family=<AddressFamily.AF_PACKET: 17>, address='00:0c:29:7e:42:9d', netmask=None, broadcast='ff:ff:ff:ff:ff:ff', ptp=None)
+#   ]
+# }
+
+
+"""网卡的状态信息"""
+# print(psutil.net_if_stats())
+# # {
+# #   'lo': snicstats(isup=表示以太网电缆或 Wi-Fi 已连接, duplex=双工通信类型, speed=网卡速度, mtu=网卡的最大传输单位，以字节表示),
+# #   'lo': snicstats(isup=True, duplex=<NicDuplex.NIC_DUPLEX_UNKNOWN: 0>, speed=0, mtu=65536),
+# #   'ens33': snicstats(isup=True, duplex=<NicDuplex.NIC_DUPLEX_FULL: 2>, speed=1000, mtu=1500)
+# # }
+
+"""系统启动时间"""
+# print(psutil.boot_time())  # 1650281599.0
+
+"""当前连接到操作系统的用户列表"""
+# print(psutil.users())
+# [
+#   用户类型(name='用户账号名', terminal='终端类型', host='客户端地址', started=创建连接的时间戳, pid=进程ID)
+#   suser(name='moluo', terminal=':0', host='localhost', started=1650267136.0, pid=2837)
+# ]
+```
+
+
+
+#### 进程信息管理
+
+```python
+import psutil
+
+
+"""获取当前系统运行的所有进程ID（PID）的排序列表"""
+# print(psutil.pids())
+# # [1, 2, ... 5509, 5516, 5539]
+
+
+"""判断指定的pid是否存在"""
+# pid_num = psutil.pids()[-10]  # psutil.pids()[-10] 仅仅是举例
+# result = psutil.pid_exists(pid_num)
+
+"""获取指定pid的进程信息"""
+# pid_num = psutil.pids()[-1]
+# pid_info=psutil.Process(pid_num)
+# print(f"进程名：{pid_info.name()}")
+# print(f"进程信息：{pid_info}")
+# print(f"启动执行命令：{pid_info.exe()}")
+# print(f"进程工作目录：{pid_info.cwd()}")
+# print(f"进程执行状态：{pid_info.status()}")
+# print(f"进程创建时间：{pid_info.create_time()}")
+# print(f"进程uid信息：{pid_info.uids()}")
+# print(f"进程gid信息：{pid_info.gids()}")
+# print(f"进程的cpu时间信息：{pid_info.cpu_times()}")
+# print(f"进程内存利用率：{pid_info.memory_percent()}")
+# print(f"进程的IO信息,包括读写IO数字及参数：{pid_info.io_counters()}")
+# print(f"进程开启的线程数：{pid_info.num_threads()}")
+
+
+"""获取当前系统运行的所有进程相关信息"""
+# for proc in psutil.process_iter(['pid', 'create_time', 'name', 'status', 'memory_percent', 'username', 'cmdline']):
+#     print(proc.info)
+```
+
+
+
+#### 本地执行终端命令
+
+```python
+import psutil
+
+"""psutil.Popen对象，终端执行命令"""
+# python3.8 -c 'print("hello world")'
+my_process=psutil.Popen(["python3.8","-c",'print("hello world")'])
+# 用户程序的信息获取
+print("用户进程的名称：{}".format(my_process.name()))
+print("用户进程的启动用户：{}".format(my_process.username()))
+print("用户进程的输出信息：{}".format(my_process.communicate()))
+```
+
+
+
+#### 实现top命令效果
+
+```python
+# !/usr/bin/env python
+import time
+import psutil
+from datetime import datetime
+from psutil._common import bytes2human as size
+
+# 获取系统启动时间
+print(f"{'-'*32} 系统时间 {'-'*32}")
+uptime = datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
+# 系统当前本地时间
+now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+print(f"系统启动时间: {uptime}\t系统本地时间：{now_time}")
+
+# 获取系统用户
+users_count = len(psutil.users())
+users_list = ",".join([u.name for u in psutil.users()])
+print(f"当前有{users_count}个用户：{users_list}")
+
+print(f"{'-'*32} CPU信息 {'-'*32}")
+# 物理cpu个数
+cpu_count = psutil.cpu_count(logical=False)
+# cpu内核个数
+logical_cpu_count = psutil.cpu_count()
+# cpu的使用率
+cpu_percent = psutil.cpu_percent(1)
+# cpu的平均负载
+cpu_loadavg = " ".join([str(item) for item in psutil.getloadavg()])
+print(f"CPU个数: {cpu_count}\t内核个数：{logical_cpu_count}\tcup使用率: {cpu_percent}%\tCPU负载参数：{cpu_loadavg}")
+
+print(f"{'-'*32} 内存信息 {'-'*32}")
+# 查看物理内存信息
+memory = psutil.virtual_memory()
+free = size(memory.free)
+total = size(memory.total)
+memory_percent = (memory.total - memory.free) / memory.total
+print(f"总物理内存：{total}\t剩余物理内存：{free:10s}物理内存使用率：{int(memory_percent * 100)}%")
+# 查看交换内存信息
+swap = psutil.swap_memory()
+free = size(swap.free)
+total = size(swap.total)
+swap_percent = (swap.total - swap.free) / swap.total
+print(f"总交换内存：{total}\t剩余交换内存：{free:10s}交换内存使用率：{int(swap_percent * 100)}%")
+
+
+print(f"{'-'*32} 网卡信息 {'-'*32}")
+# 获取网卡信息，可以得到得到网卡属性，连接数，当前数据等信息
+net = psutil.net_io_counters()
+bytes_sent = size(net.bytes_recv)
+bytes_rcvd = size(net.bytes_sent)
+print(f"网卡接收数据：{bytes_rcvd}\t网卡发送数据：{bytes_sent}")
+
+# 获取磁盘数据信息
+print(f"{'-'*32} 磁盘信息 {'-'*32}")
+io = psutil.disk_partitions()
+for i in io:
+    try:
+        o = psutil.disk_usage(i.device)
+        print(f"设备：{i.device:12s}总容量：{size(o.total):6s}已用容量：{size(o.used):6s}可用容量：{size(o.free)}")
+    except PermissionError:
+        continue
+
+print(f"{'-'*32} 进程信息 {'-'*32}")
+# 查看系统全部进程
+for pnum in psutil.pids():
+    p = psutil.Process(pnum)
+    print(f"进程名：{p.name():20.20s}内存利用率：{p.memory_percent():.2f}\t进程状态：{p.status():10s}创建时间：{datetime.fromtimestamp(p.create_time()):%Y-%m-%d %H:%M:%S}")
+```
+
+#### 监控参数整理
+
+monitor.py，代码：
+
+```python
+# !/usr/bin/env python
+import time, json
+from datetime import datetime
+try:
+    import psutil
+except:
+    os.system("pip install psutil")
+    import psutil
+from psutil._common import bytes2human as size
+
+data = {}
+# 获取系统启动时间
+data["uptime"] = datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
+# 系统当前本地时间
+data['time'] = datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")
+
+# 获取当前连接到系统的用户
+data["users_count"] = len(psutil.users())
+data["users"] = [{"name": user.name, "pid": user.pid, "terminal": user.terminal, "host": user.host, "started": datetime.fromtimestamp(user.started).strftime("%Y-%m-%d %H:%M:%S")} for user in psutil.users()]
+
+
+# 物理cpu个数
+data["cpu_count"] = psutil.cpu_count(logical=False)
+# cpu内核个数
+data["cpu_logical_count"] = psutil.cpu_count()
+# cpu的使用率
+data["cpu_every_percent"] = psutil.cpu_percent(interval=1, percpu=True)  # 每个CPU最近1秒内的使用率
+data["cpu_avg_percent"] = psutil.cpu_percent(interval=1, percpu=False)   # 系统所有CPU最近1秒内的平均使用率
+# cpu的平均负载
+data["cpu_loadavg"] = [str(item) for item in psutil.getloadavg()]
+
+# 查看物理内存信息
+data["memory"] = {}
+memory = psutil.virtual_memory()
+# 总内存
+data["memory"]["total"] = size(memory.total)
+# 空闲内存
+data["memory"]["free"] = size(memory.free)
+# 可用内存
+data["memory"]["available"] = size(memory.available)
+# 系统已用内存的百分比(不包含缓存与缓存)，percent=(total - available) / total * 100
+data["memory"]["percent1"] = size(memory.percent)
+# 系统已用内存的百分比（包含缓存与缓存）
+data["memory"]["percent2"] = (memory.total - memory.free) / memory.total
+
+# 查看交换内存信息
+data["swap_memory"] = {}
+swap = psutil.swap_memory()
+data["swap_memory"]["free"] = size(swap.free)
+data["swap_memory"]["total"] = size(swap.total)
+data["swap_memory"]["swap_percent"] = (swap.total - swap.free) / swap.total
+
+# 获取网卡信息，可以得到得到网卡属性，连接数，当前数据等信息
+data["net"] = {}
+net = psutil.net_io_counters()
+data["net"]["bytes_recv"] = size(net.bytes_recv)
+data["net"]["bytes_sent"] = size(net.bytes_sent)
+data["net"]["packets_sent"] = size(net.packets_sent)
+data["net"]["packets_recv"] = size(net.packets_recv)
+
+# 获取磁盘数据信息
+data["disk"] = []
+io = psutil.disk_partitions()
+for i in io:
+    try:
+        o = psutil.disk_usage(i.device)
+        data["disk"].append({
+          "device": i.device,
+          "total": size(o.total),
+          "used": size(o.used),
+          "free": size(o.free),
+        })
+    except PermissionError:
+        continue
+
+
+# 查看系统全部进程
+data["process_list"] = []
+for proc in psutil.process_iter(['pid', 'create_time', 'name', 'status', 'memory_percent', 'username', 'cmdline']):
+    data["process_list"].append(proc.info)
+
+print(json.dumps(data))
+```
+
+基于echarts图表实现报表效果，效果：
+
+![image-20210312194813533](assets/image-20210312194813533-1665797461354.png)
+
+
+
+客户端，`Monitor.vue`，代码：
+
+```vue
+<template>
+  <div class="monitor">
+    <div ref="container" style="height: 300px;"></div>
+  </div>
+</template>
+
+<script setup>
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+Base.vue中补充地址，代码：
+
+```vue
+        {id: 7, icon: 'mail', title: '监控预警', tube: '', 'menu_url': '/uric/monitor', children: []},
+```
+
+路由，代码：
+
+```javascript
+import Monitor from "../views/Monitor"
+
+const router = new Router({
+  mode: "history",
+  routes: [
+    //....
+    {
+      path: '/hippo',
+      name: 'Base',
+      component: Base,
+      children: [
+        // ....
+        {
+          path: 'monitor',
+          name: 'Monitor',
+          component: Monitor,
+        },
+      ]
+    },
+
+  ]
+})
+
+
+```
+
+Monitor.vue，代码：
+
+```vue
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showMonitorModal">新增监控主机</a-button>
+    </div>
+
+    <a-modal v-model:visible="MonitorModalVisible" title="新增监控主机" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item ref="task_name" label="任务名称：" prop="task_name">
+          <a-input v-model:value="form.task_name"/>
+        </a-form-item>
+        <a-form-item label="请选择主机：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择主机"
+            @change="handleHostChange"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="请选择周期方式：" prop="hosts">
+          <a-select style="width: 120px" v-model:value="form.period_way" @change="handlePeriodChange">
+            <a-select-option v-for="(period_value,period_index) in period_way_choices" :value="period_value[0]" :key="period_index">
+              {{period_value[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="period_content" label="任务周期值：" prop="period_content">
+          <a-input v-model:value="form.period_content" />
+        </a-form-item>
+        <a-form-item ref="task_cmd" label="任务指令：" prop="task_cmd">
+          <v-ace-editor v-model:value="form.task_cmd" lang="html" theme="chrome" style="height: 200px"/>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="MonitorList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a v-if="record.enabled" @click="change_schedule_status(record)">暂停</a>
+              <a v-else  @click="change_schedule_status(record)">激活</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive, watch} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+
+
+import {VAceEditor} from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/mode-html';
+import 'ace-builds/src-noconflict/theme-chrome';
+
+export default {
+  components: {
+    VAceEditor,
+  },
+  setup() {
+
+    // 表格字段列设置
+    const columns = [
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        key: 'id',
+        sorter: true,
+        width: 230
+      },
+      {
+        title: '监控主机',
+        dataIndex: 'host',
+        key: 'host',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 监控主机列表
+    const MonitorList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/schedule/tasks/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          MonitorList.value = res.data;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const period_way_choices = ref([])  // 所有周期类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        task_name: '',
+        hosts: [],
+        period_way: 1,
+        task_cmd:'',
+        period_content:'',
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    const get_period_data = ()=>{
+        axios.get(`${settings.host}/schedule/periods/`).then((res)=>{
+          period_way_choices.value = res.data;
+          console.log(period_way_choices);
+        }).catch((error)=>{
+
+        })
+    }
+
+    get_period_data()
+
+    // 是否显示添加监控主机的弹窗
+    const MonitorModalVisible = ref(false)
+    const showMonitorModal = ()=>{
+      MonitorModalVisible.value = true
+    }
+
+    const handleHostChange = ()=>{
+
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+      axios.post(`${settings.host}/schedule/tasks/`,form, {
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          MonitorList.value.unshift(res.data);
+      })
+    }
+
+    // 切换计划任务的状态
+    const change_schedule_status = (record)=>{
+      axios.put(`${settings.host}/schedule/tasks/${record.id}/`,{}, {
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          record.enabled = !record.enabled;
+      })
+    }
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      period_way_choices,
+      host_list,
+      form,
+      rules,
+      MonitorList,
+      MonitorModalVisible,
+      showMonitorModal,
+      handleHostChange,
+      handOk,
+      change_schedule_status,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+创建应用
+
+```shell
+cd uric_api/apps
+python ../../manage.py startapp monitor
+```
+
+settings.py配置应用
+
+```python
+INSTALLED_APPS = [
+    ...
+    'monitor',
+]
+```
+
+总路由
+
+```python
+path('monitor/', include('monitor.urls')),
+```
+
+monitor/urls.py
+
+```python
+from django.urls import path, re_path
+from . import  views
+
+urlpatterns = [
+    
+]
+```
+
+模型创建，monitor/models.py，代码：
+
+```python
+from django.db import models
+from host.models import Host
+from uric_api.utils.models import BaseModel
+
+class MonitorParams(BaseModel):
+    """监控参数类型"""
+    class Meta:
+        db_table = "monitor_params"
+        verbose_name = "监控参数类型"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
+class MonitorHost(models.Model):
+    """监控的主机列表"""
+    host = models.ForeignKey(Host, on_delete=models.DO_NOTHING, default=1, verbose_name='主机')
+    times = models.CharField(max_length=255, verbose_name="时间间隔")
+
+    class Meta:
+        db_table = "monitor_host"
+        verbose_name = "监控主机列表"
+        verbose_name_plural = verbose_name
+```
+
+数据迁移
+
+```bash
+cd 服务端项目根目录下
+python manage.py makemigrations
+python manage.py migrate
+```
+
+添加监测参数类型
+
+```sql
+INSERT INTO uric.monitor_params (id, name, is_show, orders, is_deleted, created_time, updated_time, description) VALUES (1, 'cpu', 1, 0, 0, '2022-10-15 15:13:01', '2022-10-15 15:13:01', 'CPU');
+INSERT INTO uric.monitor_params (id, name, is_show, orders, is_deleted, created_time, updated_time, description) VALUES (2, 'memory', 1, 0, 0, '2022-10-15 15:13:01', '2022-10-15 15:13:01', '内存');
+INSERT INTO uric.monitor_params (id, name, is_show, orders, is_deleted, created_time, updated_time, description) VALUES (3, 'disk', 1, 0, 0, '2022-10-15 15:13:01', '2022-10-15 15:13:01', '硬盘');
+```
+
+
+
+
+
+### 通知
+
+在平台上，针对参数变化，达到预设的指定阈值以后，我们就需要发送通知给指定的管理员，可以选择实现多种不同的通知类型，例如：短信、邮件、钉钉、飞书、微信等等。。
+
+
+
+#### 短信发送
+
+开发中都是到第三方短信平台购买套餐，常见的第三方短信平台：腾讯、阿里、华为、容联云等等。使用容联云第三方进行短信发送。
+
+官方网站：https://www.yuntongxun.com/user/login
+
+官方文档：http://doc.yuntongxun.com/space/5a5098313b8496dd00dcdd7f 
+
+![1615705610571](assets/1615705610571-1665797493466.png)
+
+在登录后的平台上面获取一下信息:[https://www.yuntongxun.com/]
+
+```
+ACCOUNT SID：8aaf07086f17620f016f308d0d2c0fa9
+AUTH TOKEN : be8d96030fca44ffaf958062e6c658e8
+AppID(默认)：8aaf07086f17620f016f308d0d850faf
+```
+
+
+
+https://www.yuntongxun.com/doc.html
+
+![1615705656076](assets/1615705656076-1665797493467.png)
+
+流程
+
+http://doc.yuntongxun.com/space/5a5098313b8496dd00dcdd7f
+
+![1615705685200](assets/1615705685200-1665797493467.png)
+
+
+
+找到sdkdemo进行下载
+
+![1615705698493](assets/1615705698493-1665797493467.png)
+
+
+
+文档和sdk下载地址：https://doc.yuntongxun.com/p/5f029ae7a80948a1006e776e
+
+安装短信的sdk，python模块
+
+```bash
+pip install ronglian_sms_sdk
+```
+
+测试代码，demo/发送短信.py，代码：
+
+```python
+import json
+import random
+from ronglian_sms_sdk import SmsSDK
+
+# 配置文件 settings.py
+accId = '8a216da863f8e6c20164139687e80c1b'
+accToken = '6dd01b2b60104b3dbc88b2b74158bac6'
+appId = '8a216da863f8e6c20164139688400c21'
+templateId = 1
+
+# 工具函数 utils/
+def send_message(mobile, datas, tid=None):
+    sdk = SmsSDK(accId, accToken, appId)
+    tid = templateId if tid is None else tid
+    resp = sdk.sendMessage(tid, mobile, datas)
+    response = json.loads(resp)
+    return response
+
+
+if __name__ == '__main__':
+    code = f"{random.randint(100000,999999):06d}"
+    resp = send_message('13928835901', (code, 5))
+    print(resp)
+```
+
+
+
+#### 邮件发送
+
+可以基于django本身内容的email模块来发送。
+
+```python
+from django.core import mail
+```
+
+
+
+settings.dev，代码：
+
+```python
+# 邮件发送配置
+EMAIL_HOST_USER = "13928835901@163.com"
+EMAIL_HOST_PASSWORD  = "XOLWYFIMEREAWCOU"
+EMAIL_HOST = "smtp.163.com"
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+```
+
+测试发送邮件，代码：
+
+```python
+import os, django
+from django.core import mail
+
+if __name__ == '__main__':
+    # django初始化
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'uric_api.settings.dev')
+    django.setup()
+
+    # mail.send_mail(
+    #     subject="测试标题",
+    #     message="邮件文本内容[不包含html内容]",
+    #     from_email="发件人的邮箱地址",
+    #     recipient_list="收件人的邮箱列表",
+    #     html_message="邮件HTML内容")
+
+    # 其中，message与html_message是互斥的，只能指定其中一个参数
+    mail.send_mail(
+        subject="测试标题",
+        message="邮件文本内容[不包含html内容]",
+        from_email="13928835901@163.com",
+        recipient_list=["13928835901@163.com"])
+```
+
+修改模型，添加通知相关的字段，monitor/models.py，代码：
+
+```python
+from django.db import models
+from host.models import Host
+from uric_api.utils.models import BaseModel
+
+
+class MonitorParams(BaseModel):
+    """监控参数类型"""
+    class Meta:
+        db_table = "monitor_params"
+        verbose_name = "监控参数类型"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
+class MonitorHost(models.Model):
+    """监控的主机列表"""
+    NOTIFICATION_TYPE = (
+        (0, "邮件通知"),
+        (1, "短信通知"),
+        (2, "微信通知"),
+        (3, "钉钉通知"),
+    )
+    host = models.ForeignKey(Host, on_delete=models.DO_NOTHING, verbose_name='主机')
+    times = models.CharField(max_length=255, verbose_name="时间间隔")
+    param = models.ForeignKey(MonitorParams, default=None, null=True, blank=True, on_delete=models.DO_NOTHING, verbose_name="监控参数")
+    value = models.FloatField(default=0, null=True, blank=True, verbose_name="预警阈值")
+    notification_type = models.SmallIntegerField(choices=NOTIFICATION_TYPE, default=0, verbose_name="通知类型")
+    notification_info = models.CharField(default=None, null=True, blank=True, max_length=500, verbose_name="通知人")
+
+    class Meta:
+        db_table = "monitor_host"
+        verbose_name = "监控主机列表"
+        verbose_name_plural = verbose_name
+
+```
+
+重新数据迁移，
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+
+
+### 功能实现
+
+序列化器，`monitor/serializer.py`，代码：
+
+```python
+from rest_framework import serializers
+from .models import MonitorParams, MonitorHost
+
+class MonitorParamsModelSerializer(serializers.ModelSerializer):
+    """监控参数类型的序列化器"""
+    class Meta:
+        model = MonitorParams
+        fields = ["id", "name", "description"]
+
+
+class MonitorHostModelSerlaizer(serializers.ModelSerializer):
+    """监控主机的序列化器"""
+    host_name = serializers.CharField(source="host.name", read_only=True)
+    host_ip_addr = serializers.CharField(source="host.ip_addr", read_only=True)
+    host_port = serializers.IntegerField(source="host.port", read_only=True)
+    param_name = serializers.CharField(source="param.name", read_only=True)
+    param_description = serializers.CharField(source="param.description", read_only=True)
+
+    class Meta:
+        model = MonitorHost
+        fields = ["id", "host", "host_name", "host_ip_addr", "host_port", "times", "param", "param_name", "param_description", "value", "notification_type", "get_notification_type_display", "notification_info"]
+
+```
+
+视图，`monitor/views.py`，代码：
+
+```python
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
+from .models import MonitorHost, MonitorParams
+from .serializers import MonitorParamsModelSerializer, MonitorHostModelSerlaizer
+
+
+# Create your views here.
+class MonitorParamViewSet(ModelViewSet):
+    queryset = MonitorParams.objects.all()
+    serializer_class = MonitorParamsModelSerializer
+
+
+class NotificationTypeAPIView(APIView):
+    def get(self, request):
+        """获取监控的通知类型"""
+        return Response(MonitorHost.NOTIFICATION_TYPE)
+
+class MonitorHostViewSet(ModelViewSet):
+    queryset = MonitorHost.objects.all()
+    serializer_class = MonitorHostModelSerlaizer
+```
+
+路由，`monitor/urls.py`，代码：
+
+```python
+from django.urls import path, re_path
+from . import  views
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register("param", views.MonitorParamViewSet, basename="param")
+router.register("host", views.MonitorHostViewSet, basename="host")
+
+urlpatterns = [
+    path("notif/", views.NotificationTypeAPIView.as_view()),
+] + router.urls
+```
+
+客户端实现监控主机列表信息，views/Monitor.vue，代码：
+
+```vue
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showMonitorModal">新增监控主机</a-button>
+    </div>
+
+    <a-modal v-model:visible="MonitorModalVisible" title="新增监控主机" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item label="主机列表：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择要监控主机"
+            @change="handleHostChange"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="监控参数：" prop="param">
+          <a-select style="width: 120px" v-model:value="form.param" placeholder="请选择要监控的参数类型">
+            <a-select-option v-for="(param,key) in monitor_param_choices" :value="param.id" :key="param.id">
+              {{param.description}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="value" label="报警阈值：" prop="value">
+          <a-input v-model:value="form.value" style="width: 60px;"/> %
+        </a-form-item>
+        <a-form-item label="通知类型：" prop="notification_type">
+          <a-select style="width: 120px" v-model:value="form.notification_type" placeholder="请选择要监控的参数类型">
+            <a-select-option v-for="(notification,index) in notification_type_choices" :value="index" :key="index">
+              {{notification[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="notification_info" label="通知人列表：" prop="notification_info">
+          <a-input v-model:value="form.notification_info" />
+        </a-form-item>
+        <a-form-item ref="times" label="时间间隔：" prop="times">
+          <a-input v-model:value="form.times" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="MonitorList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a>查看</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+
+export default {
+  setup() {
+    // 表格字段列设置
+    const columns = [
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        key: 'id',
+        sorter: true,
+        width: 100
+      },
+      {
+        title: '监控主机',
+        dataIndex: 'host',
+        key: 'host',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '通知类型',
+        dataIndex: 'notification',
+        key: 'notification',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '监控参数',
+        dataIndex: 'param',
+        key: 'param',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 监控主机列表
+    const MonitorList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/monitor/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+        let infoList = []
+        for (const item of res.data) {
+          infoList.push({
+            id: item.id,
+            notification: item.get_notification_type_display,
+            host_id: item.host,
+            host: `${item.host_name}[${item.host_ip_addr}:${item.host_port}]`,
+            param: item.param_description,
+          });
+        }
+          MonitorList.value = infoList;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const monitor_param_choices = ref([])  // 所有监控参数类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        hosts: [],
+        param: 1,
+        value: 0,
+        notification_type:0,
+        notification_info: '',
+        times: 60,
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    // 获取监控参数类型
+    const get_monitor_param = ()=>{
+      axios.get(`${settings.host}/monitor/param/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          monitor_param_choices.value = res.data;
+      })
+    }
+    get_monitor_param()
+
+    // 获取监控参数类型
+    const notification_type_choices = ref([])
+    const get_notification_type = ()=>{
+      axios.get(`${settings.host}/monitor/notif/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          notification_type_choices.value = res.data;
+      })
+    }
+    get_notification_type()
+
+    // 是否显示添加监控主机的弹窗
+    const MonitorModalVisible = ref(false)
+    const showMonitorModal = ()=>{
+      MonitorModalVisible.value = true
+    }
+
+    const handleHostChange = ()=>{
+
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+      console.log(form)
+      // axios.post(`${settings.host}/schedule/tasks/`,form, {
+      //   headers:{
+      //     Authorization: "jwt " + store.getters.token
+      //   }
+      // }).then((res) => {
+      //     MonitorList.value.unshift(res.data);
+      // })
+    }
+
+
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      monitor_param_choices,
+      notification_type_choices,
+      host_list,
+      form,
+      rules,
+      MonitorList,
+      MonitorModalVisible,
+      showMonitorModal,
+      handleHostChange,
+      handOk,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+实现监控主机信息的添加，views/Monitor.vue，代码：
+
+```vue
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showMonitorModal">新增监控主机</a-button>
+    </div>
+
+    <a-modal v-model:visible="MonitorModalVisible" title="新增监控主机" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item label="主机列表：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择要监控主机"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="监控参数：" prop="param">
+          <a-select style="width: 120px" v-model:value="form.param" placeholder="请选择要监控的参数类型">
+            <a-select-option v-for="(param,key) in monitor_param_choices" :value="param.id" :key="param.id">
+              {{param.description}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="value" label="报警阈值：" prop="value">
+          <a-input v-model:value="form.value" style="width: 60px;"/> %
+        </a-form-item>
+        <a-form-item label="通知类型：" prop="notification_type">
+          <a-select style="width: 120px" v-model:value="form.notification_type" placeholder="请选择要监控的参数类型">
+            <a-select-option v-for="(notification,index) in notification_type_choices" :value="index" :key="index">
+              {{notification[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="notification_info" label="通知人列表：" prop="notification_info">
+          <a-input v-model:value="form.notification_info" />
+        </a-form-item>
+        <a-form-item ref="times" label="时间间隔：" prop="times">
+          <a-input v-model:value="form.times" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="MonitorList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a>查看</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+
+export default {
+  setup() {
+    // 表格字段列设置
+    const columns = [
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        key: 'id',
+        sorter: true,
+        width: 100
+      },
+      {
+        title: '监控主机',
+        dataIndex: 'host',
+        key: 'host',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '通知类型',
+        dataIndex: 'notification',
+        key: 'notification',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '监控参数',
+        dataIndex: 'param',
+        key: 'param',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 监控主机列表
+    const MonitorList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/monitor/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+        let infoList = []
+        for (const item of res.data) {
+          infoList.push({
+            id: item.id,
+            notification: item.get_notification_type_display,
+            host_id: item.host,
+            host: `${item.host_name}[${item.host_ip_addr}:${item.host_port}]`,
+            param: item.param_description,
+          });
+        }
+          MonitorList.value = infoList;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const monitor_param_choices = ref([])  // 所有监控参数类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        hosts: [],
+        param: 1,
+        value: 0,
+        notification_type:0,
+        notification_info: '',
+        times: 60,
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    // 获取监控参数类型
+    const get_monitor_param = ()=>{
+      axios.get(`${settings.host}/monitor/param/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          monitor_param_choices.value = res.data;
+      })
+    }
+    get_monitor_param()
+
+    // 获取监控参数类型
+    const notification_type_choices = ref([])
+    const get_notification_type = ()=>{
+      axios.get(`${settings.host}/monitor/notif/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          notification_type_choices.value = res.data;
+      })
+    }
+    get_notification_type()
+
+    // 是否显示添加监控主机的弹窗
+    const MonitorModalVisible = ref(false)
+    const showMonitorModal = ()=>{
+      MonitorModalVisible.value = true
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+      let hosts = form.hosts
+      delete form.hosts
+      console.log(form)
+      for (const host of hosts) {
+        form['host'] = host
+        axios.post(`${settings.host}/monitor/host/`,form, {
+          headers:{
+            Authorization: "jwt " + store.getters.token
+          }
+        }).then((res) => {
+            message.success("添加监控主机信息成功！")
+            MonitorModalVisible.value = false
+            MonitorList.value.unshift({
+            id: res.data.id,
+            notification: res.data.get_notification_type_display,
+            host_id: res.data.host,
+            host: `${res.data.host_name}[${res.data.host_ip_addr}:${res.data.host_port}]`,
+            param: res.data.param_description,
+          });
+        })
+      }
+    }
+
+
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      monitor_param_choices,
+      notification_type_choices,
+      host_list,
+      form,
+      rules,
+      MonitorList,
+      MonitorModalVisible,
+      showMonitorModal,
+      handOk,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+客户端展示监控器窗口，views/MonitorWindow.vue，代码：
+
+```vue
+<template>
+  <div class="chart" ref="echartDiv" style="width: 800px; height: 350px;"></div>
+</template>
+
+<script>
+import {ref, reactive, onMounted} from 'vue';
+import * as echarts from 'echarts';
+
+export default {
+  name: "MonitorWindow",
+  setup(){
+    const echartDiv = ref()
+    const host_monitor_data = ref([])
+    const get_data = ()=>{
+      host_monitor_data.value = [
+          {name: "2022-11-11 11:01:00", "value": ["2022-11-11 11:01:00", 10]},
+          {name: "2022-11-11 11:01:30", "value": ["2022-11-11 11:01:30", 20]},
+          {name: "2022-11-11 11:02:00", "value": ["2022-11-11 11:02:00", 30]},
+          {name: "2022-11-11 11:02:30", "value": ["2022-11-11 11:02:30", 40]},
+          {name: "2022-11-11 11:03:00", "value": ["2022-11-11 11:03:00", 50]},
+          {name: "2022-11-11 11:03:30", "value": ["2022-11-11 11:03:30", 30]},
+      ]
+    }
+
+    get_data();
+
+    const showEchart = ()=>{
+      let myChart = echarts.init(echartDiv.value);
+      let option = {
+        title: {
+          text: '监控显示器'
+        },
+        tooltip: {
+          trigger: 'axis',
+          formatter(params) {
+            params = params[0];
+            let date = new Date(params.name);
+            return (
+              date.getDate() +
+              '/' +
+              (date.getMonth() + 1) +
+              '/' +
+              date.getFullYear() +
+              ' ' +
+              date.getHours() +
+              ':' +
+              date.getMinutes() +
+              ':' +
+              date.getSeconds() +
+              '  ' +
+              params.value[1]
+            );
+          },
+          axisPointer: {
+            animation: false
+          }
+        },
+        xAxis: {
+          type: 'time',
+          splitLine: {
+            show: false
+          }
+        },
+        yAxis: {
+          type: 'value',
+          boundaryGap: [0, '100%'],
+          splitLine: {
+            show: false
+          }
+        },
+        series: [
+          {
+            name: 'Fake Data',
+            type: 'line',
+            showSymbol: false,
+            data: host_monitor_data.value
+          }
+        ]
+      };
+      option && myChart.setOption(option);
+    }
+
+    onMounted(()=>{
+      showEchart()
+    })
+
+    return {
+      echartDiv,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+views/Monitor.vue，代码：
+
+```vue
+<template>
+  <div class="schedule">
+    <div class="add_app" style="margin-top: 20px">
+      <a-button style="margin-bottom: 20px;" @click="showMonitorModal">新增监控主机</a-button>
+    </div>
+
+    <a-modal v-model:visible="MonitorModalVisible" title="新增监控主机" @ok="handOk" ok-text="添加" cancel-text="取消">
+      <a-form
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item label="主机列表：" prop="hosts">
+          <a-select
+            mode="multiple"
+            v-model:value="form.hosts"
+            style="width: 100%"
+            placeholder="请选择要监控主机"
+          >
+            <a-select-option v-for="(host_value,host_index) in host_list" :key="host_index" :value="host_value.id">
+             {{host_value.ip_addr}}--{{host_value.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="监控参数：" prop="param">
+          <a-select style="width: 120px" v-model:value="form.param" placeholder="请选择要监控的参数类型">
+            <a-select-option v-for="(param,key) in monitor_param_choices" :value="param.id" :key="param.id">
+              {{param.description}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="value" label="报警阈值：" prop="value">
+          <a-input v-model:value="form.value" style="width: 60px;"/> %
+        </a-form-item>
+        <a-form-item label="通知类型：" prop="notification_type">
+          <a-select style="width: 120px" v-model:value="form.notification_type" placeholder="请选择要监控的参数类型">
+            <a-select-option v-for="(notification,index) in notification_type_choices" :value="index" :key="index">
+              {{notification[1]}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="notification_info" label="通知人列表：" prop="notification_info">
+          <a-input v-model:value="form.notification_info" />
+        </a-form-item>
+        <a-form-item ref="times" label="时间间隔：" prop="times">
+          <a-input v-model:value="form.times" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <div class="release">
+      <div class="app_list">
+        <a-table :columns="columns" :data-source="MonitorList" row-key="id">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'action'">
+              <a @click="showMonitorInfoModal(record)">查看</a>
+              <span style="color: lightgray"> | </span>
+              <a>删除</a>
+            </template>
+          </template>
+        </a-table>
+      </div>
+    </div>
+    <a-modal v-model:visible="MonitorVisible" :wrap-style="{ overflow: 'hidden' }" width="800px" title="监控窗口" @ok="handleOk">
+      <MonitorWindow></MonitorWindow>
+    </a-modal>
+
+  </div>
+</template>
+
+<script>
+import {ref, reactive} from 'vue';
+import axios from "axios";
+import settings from "@/settings";
+import {message} from 'ant-design-vue';
+import store from "@/store";
+import MonitorWindow from "@/views/MonitorWindow";
+
+export default {
+  components: {
+    MonitorWindow
+  },
+  setup() {
+    // 表格字段列设置
+    const columns = [
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        key: 'id',
+        sorter: true,
+        width: 100
+      },
+      {
+        title: '监控主机',
+        dataIndex: 'host',
+        key: 'host',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '通知类型',
+        dataIndex: 'notification',
+        key: 'notification',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '监控参数',
+        dataIndex: 'param',
+        key: 'param',
+        sorter: true,
+        width: 150
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        width: 300,
+        key: 'action', scopedSlots: {customRender: 'action'}
+      },
+    ]
+
+
+    // 监控主机列表
+    const MonitorList = ref([]);
+
+    const get_tasks_list = ()=>{
+      axios.get(`${settings.host}/monitor/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+        let infoList = []
+        for (const item of res.data) {
+          infoList.push({
+            id: item.id,
+            notification: item.get_notification_type_display,
+            host_id: item.host,
+            host: `${item.host_name}[${item.host_ip_addr}:${item.host_port}]`,
+            param: item.param_description,
+          });
+        }
+          MonitorList.value = infoList;
+      })
+    }
+
+    get_tasks_list();
+
+    const labelCol = reactive({span: 4})
+    const wrapperCol = reactive({span: 14})
+    const other = ref('')
+    const monitor_param_choices = ref([])  // 所有监控参数类型数据
+    const host_list = ref([]) // 主机列表数据
+
+    const form = reactive({
+        hosts: [],
+        param: 1,
+        value: 0,
+        notification_type:0,
+        notification_info: '',
+        times: 60,
+    })
+
+    const rules = reactive({
+      task_name: [
+        {required: true, message: '请输入任务名称', trigger: 'blur'},
+      ],
+    })
+
+    // 获取主机列表
+    const get_host_list = ()=>{
+      axios.get(`${settings.host}/host/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          host_list.value = res.data;
+      })
+    }
+
+    get_host_list();
+
+    // 获取监控参数类型
+    const get_monitor_param = ()=>{
+      axios.get(`${settings.host}/monitor/param/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          monitor_param_choices.value = res.data;
+      })
+    }
+    get_monitor_param()
+
+    // 获取监控参数类型
+    const notification_type_choices = ref([])
+    const get_notification_type = ()=>{
+      axios.get(`${settings.host}/monitor/notif/`,{
+        headers:{
+          Authorization: "jwt " + store.getters.token
+        }
+      }).then((res) => {
+          notification_type_choices.value = res.data;
+      })
+    }
+    get_notification_type()
+
+    // 是否显示添加监控主机的弹窗
+    const MonitorModalVisible = ref(false)
+    const showMonitorModal = ()=>{
+      MonitorModalVisible.value = true
+    }
+
+    // 提交表单
+    const handOk = ()=>{
+      let hosts = form.hosts
+      delete form.hosts
+      console.log(form)
+      for (const host of hosts) {
+        form['host'] = host
+        axios.post(`${settings.host}/monitor/host/`,form, {
+          headers:{
+            Authorization: "jwt " + store.getters.token
+          }
+        }).then((res) => {
+            message.success("添加监控主机信息成功！")
+            MonitorModalVisible.value = false
+            MonitorList.value.unshift({
+            id: res.data.id,
+            notification: res.data.get_notification_type_display,
+            host_id: res.data.host,
+            host: `${res.data.host_name}[${res.data.host_ip_addr}:${res.data.host_port}]`,
+            param: res.data.param_description,
+          });
+        })
+      }
+    }
+
+    // 控制是否显示监控窗口
+    const MonitorVisible = ref(false)
+    const showMonitorInfoModal = (record)=>{
+      console.log("显示的监控信息：", record);
+      MonitorVisible.value = true;
+    }
+
+    return {
+      columns,
+      labelCol,
+      wrapperCol,
+      other,
+      monitor_param_choices,
+      notification_type_choices,
+      host_list,
+      form,
+      rules,
+      MonitorList,
+      MonitorModalVisible,
+      showMonitorModal,
+      handOk,
+      MonitorVisible,
+      showMonitorInfoModal,
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+
+
+接下来，我们就可以在服务端提供对应的监控参数给客户端了。
+
+具体实现思路如下：
+
+![image-20221015182946250](assets/image-20221015182946250.png)
+
+#### 在视图中基于sftp上传监控脚本到目标主机
+
+> 目标主机上传监控数据的方案：
+>
+> 1. 基于monitor.py脚本实现上传参数，可以通过安装python的第三方模块requests或者python内置的urllib模块
+>     pip install requests
+> 2. 基于monitor.sh脚本实现上传参数，可以通过curl 或者 wget 使用http协议上传数据到django中
+
+在ssh工具类中实现上传文件的方法
+
+```python
+from paramiko.client import SSHClient, AutoAddPolicy
+from paramiko.rsakey import RSAKey
+from paramiko.ssh_exception import AuthenticationException, SSHException
+from io import StringIO
+from paramiko.ssh_exception import NoValidConnectionsError
+
+
+class SSHParamiko(object):
+    def __init__(self, hostname, port=22, username='root', pkey=None, password=None, connect_timeout=3):
+        if pkey is None and password is None:
+            raise SSHException('私钥或者密码必须选择传入一个')
+
+        self.client = None
+
+        self.params = {
+            'hostname': hostname,
+            'port': port,
+            'username': username,
+            'password': password,
+            'pkey': RSAKey.from_private_key(StringIO(pkey)) if isinstance(pkey, str) else pkey,
+            'timeout': connect_timeout,
+        }
+
+    # 检测连接并获取连接
+    def get_connected_client(self):
+        if self.client is not None:
+            # 告知当前执行上下文，self.client已经实例化
+            raise RuntimeError('已经建立连接了！！！')
+
+        if not self.client:
+            try:
+                # 创建客户端连接对象
+                self.client = SSHClient()
+                # 在本机第一次连接远程主机时记录指纹信息
+                self.client.set_missing_host_key_policy(AutoAddPolicy)
+                # 建立连接: 口令密码或者密钥
+                self.client.connect(**self.params)
+            except (TimeoutError, NoValidConnectionsError, AuthenticationException) as e:
+                return None
+
+        return self.client
+
+    @staticmethod
+    def gen_key():
+        # 生成公私钥键值对
+        iodata = StringIO()
+        key = RSAKey.generate(2048)  # 生成长度为2024的秘钥对
+        key.write_private_key(iodata)
+        # 返回值是一个元祖，两个成员分别是私钥和公钥
+        return iodata.getvalue(), 'ssh-rsa ' + key.get_base64()
+
+    # 将公钥上传到对应主机
+    def upload_key(self, public_key):
+        print("self.client:::", self.client)
+        # 700 是文档拥有可读可写可执行，同一组用户或者其他用户都不具有操作权限
+        # 600 是文件拥有者可读可写，不可执行，同一组用户或者其他用户都不具有操作权限
+        cmd = f'mkdir -p -m 700 ~/.ssh && \
+            echo {public_key!r} >> ~/.ssh/authorized_keys && \
+            chmod 600 ~/.ssh/authorized_keys'
+        code, out = self.execute_cmd(cmd)
+        print("out", out)
+        if code != 0:
+            raise Exception(f'添加公钥失败: {out}')
+
+    def execute_cmd(self, cmd, timeout=1800):
+        # 设置执行指令过程，一旦遇到错误/异常，则直接退出操作，不再继续执行。
+        cmd = 'set -e\n' + cmd
+        channel = self.client.get_transport().open_session()
+        channel.settimeout(timeout)
+        channel.set_combine_stderr(True)  # 正确和错误输出都在一个管道对象里面输出出来
+        channel.exec_command(cmd)
+        try:
+            out_data = channel.makefile("rb", -1).read().decode()
+        except UnicodeDecodeError:
+            out_data = channel.makefile("rb", -1).read().decode("GBK")
+
+        return channel.recv_exit_status(), out_data
+
+    def upload_file(self, fl, remote_path):
+        """
+        上传文件到远程主机
+        :param fl: 本地文件的句柄对象  fl = open()
+        :param remote_path: 远程主机保存文件的路径与文件名
+        :return:
+        """
+        sftp = self.client.open_sftp()
+        return sftp.putfo(fl, remote_path)
+
+    def download_file(self, remote_path, local_path):
+        """
+        从远程主机下载文件到本地
+        :param remote_path: 远程主机要下载的文件的路径+文件名
+        :param local_path: 本地保存下载文件的路径地址
+        :return:
+        """
+        sftp = self.client.open_sftp()
+        return sftp.get(remote_path, local_path)
+
+    def list_dir_attr(self, remote_path):
+        """
+        列出远程主机的指定路径下所有的文件/目录的相关信息
+        模拟：ls -l 命令
+        :param remote_path:
+        :return:
+        """
+        sftp = self.client.open_sftp()
+        return sftp.listdir_attr(remote_path)
+
+    def remove_file(self, remote_path):
+        """
+        删除指定文件
+        :param remote_path: 远程主机上要删除文件的路径+文件名，如果没有对应文件会报错，有返回None
+        :return:
+        """
+        sftp = self.client.open_sftp()
+        return sftp.remove(remote_path)
+
+    # 删除远程主机上的目录
+    def remove_dir(self, remote_path):
+        """
+        删除空目录
+        :param remote_path: 远程主机上要删除的空目录的路径
+        :return:
+        """
+        sftp = self.client.open_sftp()
+        sftp.rmdir(remote_path)
+
+```
+
+配置中新增监控脚本的路径，settings/dev.py，代码：
+
+```python
+# 监控脚本的路径
+MONITOR_SCRIPT = BASE_DIR.parent / "scripts/monitor.py"
+REMOTE_MONITOR_SCRIPT_PATH = "~/monitor.py"
+```
+
+视图，monitor.py，代码：
+
+```python
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
+from .models import MonitorHost, MonitorParams
+from .serializers import MonitorParamsModelSerializer, MonitorHostModelSerlaizer
+from host.models import Host
+from uric_api.utils.key import PkeyManager
+from django.conf import settings
+from uric_api.utils.ssh import SSHParamiko
+
+# Create your views here.
+class MonitorParamViewSet(ModelViewSet):
+    """监控参数类型"""
+    queryset = MonitorParams.objects.all()
+    serializer_class = MonitorParamsModelSerializer
+
+
+class NotificationTypeAPIView(APIView):
+    """获取监控的通知类型"""
+    def get(self, request):
+        return Response(MonitorHost.NOTIFICATION_TYPE)
+
+class MonitorHostViewSet(ModelViewSet):
+    """监控主机列表"""
+    queryset = MonitorHost.objects.all()
+    serializer_class = MonitorHostModelSerlaizer
+
+    def create(self, request, *arg, **kwargs):
+        # 根据上传的主机ID，使用parmiko基于ssh协议上传监控监本
+        host_id = request.data.get("host")
+        host = Host.objects.filter(id=host_id).first()
+        pkey, _ = PkeyManager.get(settings.DEFAULT_KEY_NAME)  # 获取ssh秘钥
+        ssh = SSHParamiko(host.ip_addr, host.port, host.username, pkey)
+        ssh.get_connected_client()
+        # 基于ssh上传文件
+        fl = open(settings.MONITOR_SCRIPT, "rb")
+        ssh.upload_file(fl, settings.REMOTE_MONITOR_SCRIPT_PATH.replace("~", ssh.execute_cmd("cd ~ && pwd")[1][:-1]))
+        return super().create(request, *arg, **kwargs)
+
+```
+
+#### 服务端提提供视图给远程主机上传监控数据
+
+monitor/view.py，代码：
+
+```python
+
+```
+
+监控脚本调用requests请求请求django保存监控数据
+
+
+
+客户端定时ajax请求服务端的监控数据
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
